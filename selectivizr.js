@@ -102,42 +102,42 @@ References:
 	// Scans the passed cssText for selectors that require emulation and
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
-		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING)
-			.replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
-			var selectorGroups = selectorText.split(",")
-			for (var c=0, cs=selectorGroups.length; c<cs; c++) {
-				var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
-				var patches = [];
-				selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, 
-					function(match, combinator, pseudo, attribute, index) {
-						if (combinator) {
-							if (patches.length>0) {
-								applyPatches( selector.substring(0, index), patches )
-								patches = []
-							}
-							return combinator;
-						}		
-						else {
-							var patch = (pseudo) ? patchPseudoClass( pseudo ) : patchAttribute( attribute );
-							if (patch) {
-								patches.push(patch);
-								return "." + patch.className;
-							}
-							return match;
-						}
-					}
-				)
-			}
-			return prefix + selectorGroups.join(",");
-		})
-	}
+		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
+			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
+    			var selectorGroups = selectorText.split(",");
+    			for (var c=0, cs=selectorGroups.length; c<cs; c++) {
+    				var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
+    				var patches = [];
+    				selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, 
+    					function(match, combinator, pseudo, attribute, index) {
+    						if (combinator) {
+    							if (patches.length>0) {
+    								applyPatches( selector.substring(0, index), patches );
+    								patches = [];
+    							}
+    							return combinator;
+    						}		
+    						else {
+    							var patch = (pseudo) ? patchPseudoClass( pseudo ) : patchAttribute( attribute );
+    							if (patch) {
+    								patches.push(patch);
+    								return "." + patch.className;
+    							}
+    							return match;
+    						}
+    					}
+    				);
+    			}
+    			return prefix + selectorGroups.join(",");
+    		});
+	};
 
 	// --[ patchAttribute() ]-----------------------------------------------
 	// returns a patch for an attribute selector.
 	function patchAttribute( attr ) {
 		return (!BROKEN_ATTR_IMPLEMENTATIONS || BROKEN_ATTR_IMPLEMENTATIONS.test(attr)) ? 
 			{ className: createClassName(attr), applyClass: true } : null;
-	}
+	};
 
 
 	// --[ patchPseudoClass() ]---------------------------------------------
@@ -252,7 +252,7 @@ References:
 			}
 		}
 		return { className: className, applyClass: applyClass };
-	}
+	};
 
 	// --[ applyPatches() ]-------------------------------------------------
 	// uses the passed selector text to find DOM nodes and patch them	
@@ -296,14 +296,14 @@ References:
 				elm.className = cssClasses;
 			}
 		}
-	}
+	};
 
 
 	// --[ hasPatch() ]-----------------------------------------------------
 	// checks for the exsistence of a patch on an element
 	function hasPatch( elm, patch ) {
 		return new RegExp("(^|\\s)" + patch.className + "(\\s|$)").test(elm.className);
-	}
+	};
 	
 	
 	// =========================== Utility =================================
@@ -313,7 +313,7 @@ References:
 			ie6PatchID++
 		:
 			className.replace(RE_PATCH_CLASS_NAME_REPLACE, function(a){return a.charCodeAt(0)}));
-	}
+	};
 
 	// --[ log() ]----------------------------------------------------------
 	// #DEBUG_START
@@ -321,29 +321,29 @@ References:
 		if (win.console) {
 			win.console.log(message);
 		}
-	}
+	};
 	// #DEBUG_END
 
 	// --[ trim() ]---------------------------------------------------------
 	// removes leading, trailing whitespace from a string
 	function trim( text ) {
 		return text.replace(RE_TIDY_TRIM_WHITESPACE, PLACEHOLDER_STRING);
-	}
+	};
 
 	// --[ normalizeWhitespace() ]------------------------------------------
 	// removes leading, trailing and consecutive whitespace from a string
 	function normalizeWhitespace( text ) {
 		return trim(text).replace(RE_TIDY_CONSECUTIVE_WHITESPACE, SPACE_STRING);
-	}
+	};
 
 	// --[ normalizeSelectorWhitespace() ]----------------------------------
 	// tidies whitespace around selector brackets and combinators
 	function normalizeSelectorWhitespace( selectorText ) {
-		return normalizeWhitespace(selectorText
-			.replace(RE_TIDY_TRAILING_WHITESPACE, PLACEHOLDER_STRING)
-			.replace(RE_TIDY_LEADING_WHITESPACE, PLACEHOLDER_STRING)
+		return normalizeWhitespace(selectorText.
+			replace(RE_TIDY_TRAILING_WHITESPACE, PLACEHOLDER_STRING).
+			replace(RE_TIDY_LEADING_WHITESPACE, PLACEHOLDER_STRING)
 		);
-	}
+	};
 
 	// --[ toggleElementClass() ]-------------------------------------------
 	// toggles a single className on an element
@@ -354,7 +354,7 @@ References:
 			elm.className = newClassName;
 			elm.parentNode.className += EMPTY_STRING;
 		}
-	}
+	};
 
 	// --[ toggleClass() ]--------------------------------------------------
 	// adds / removes a className from a string of classNames. Used to 
@@ -367,12 +367,12 @@ References:
 		} else {
 			return classExists ? trim(classList.replace(re, PLACEHOLDER_STRING)) : classList;
 		}
-	}
+	};
 	
 	// --[ addEvent() ]-----------------------------------------------------
 	function addEvent(elm, eventName, eventHandler) {
 		elm.attachEvent("on"+eventName, eventHandler);
-	}
+	};
 
 
 	// --[ getXHRObject() ]-------------------------------------------------
@@ -386,14 +386,14 @@ References:
 		} catch(e) { 
 			return null;
 		}
-	}
+	};
 
 	// --[ loadStyleSheet() ]-----------------------------------------------
 	function loadStyleSheet( url ) {
 		xhr.open("GET", url, false);
 		xhr.send();
 		return (xhr.status==200) ? xhr.responseText : EMPTY_STRING;	
-	}	
+	};
 	
 	// --[ resolveUrl() ]---------------------------------------------------
 	// Converts a URL fragment to a fully qualified URL using the specified
@@ -402,7 +402,7 @@ References:
 	
 		function getProtocolAndHost( url ) {
 			return url.substring(0, url.indexOf("/", 8));
-		}
+		};
 		
 		// absolute path
 		if (/^https?:\/\//i.test(url)) {
@@ -421,7 +421,7 @@ References:
 		}
 		
 		return contextUrlPath + url;
-	}
+	};
 	
 	// --[ parseStyleSheet() ]----------------------------------------------
 	// Downloads the stylesheet specified by the URL, removes it's comments
@@ -441,7 +441,7 @@ References:
 			});
 		}
 		return EMPTY_STRING;
-	}
+	};
 	
 	// --[ init() ]---------------------------------------------------------
 	function init() {
@@ -504,7 +504,7 @@ References:
 				}
 			},250)
 		}
-	}
+	};
 	
 	// --[ determineSelectorMethod() ]--------------------------------------
 	// walks through the selectorEngines object testing for an suitable
@@ -517,7 +517,7 @@ References:
 			}
 		}
 		return false;
-	}
+	};
 	
 	// Emulate DOMReady event (Dean Edwards)
 	doc.write("<script id="+domReadyScriptID+" defer src='//:'><\/script>");
@@ -529,5 +529,5 @@ References:
 				this.parentNode.removeChild(this);
 			}
 		}
-	}
+	};
 })(this);
