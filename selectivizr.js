@@ -70,7 +70,7 @@ References:
 	// Stylesheet parsing regexp's
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*/g
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))[^;]*;/g
-	var RE_ASSET_URL 						= /\burl\(\s*(["']?)([^"')]+)\1\s*\)/g;
+	var RE_ASSET_URL 						= /\burl\(\s*(["']?)(?!data)([^"')]+)\1\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g
 	var RE_SELECTOR_GROUP					= /(^|})\s*([^\{]*?[\[:][^{]+)/g
