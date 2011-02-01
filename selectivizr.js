@@ -105,7 +105,7 @@ References:
 		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
     			var selectorGroups = selectorText.split(",");
-    			for (var c=0, cs=selectorGroups.length; c<cs; c++) {
+    			for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
     				var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
     				var patches = [];
     				selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, 
@@ -146,7 +146,7 @@ References:
 
 		var applyClass = true;
 		var className = createClassName(pseudo.slice(1));
-		var isNegated = pseudo.substring(0, 5)==":not(";
+		var isNegated = pseudo.substring(0, 5) == ":not(";
 		var activateEventName;
 		var deactivateEventName;
 
@@ -157,17 +157,17 @@ References:
 		
 		// bracket contents are irrelevant - remove them
 		var bracketIndex = pseudo.indexOf("(")
-		if (bracketIndex>-1) {
+		if (bracketIndex > -1) {
 			pseudo = pseudo.substring(0, bracketIndex);
 		}		
 		
 		// check we're still dealing with a pseudo-class
-		if (pseudo.charAt(0)==":") {
+		if (pseudo.charAt(0) == ":") {
 			switch (pseudo.slice(1)) {
 
 				case "root":
 					applyClass = function(e) {
-						return isNegated ? e!=root : e==root;
+						return isNegated ? e != root : e == root;
 					}
 					break;
 
@@ -178,7 +178,7 @@ References:
 							var handler = function() { 
 								var hash = location.hash;
 								var hashID = hash.slice(1);
-								return isNegated ? (hash=="" || e.id != hashID) : (hash!="" && e.id == hashID);
+								return isNegated ? (hash == "" || e.id != hashID) : (hash != "" && e.id == hashID);
 							};
 							addEvent( win, "hashchange", function() {
 								toggleElementClass(e, className, handler());
@@ -212,12 +212,12 @@ References:
 								if (event.propertyName == "$disabled") {
 									toggleElementClass( e, className, e.$disabled === isNegated );
 								} 
-							})
+							});
 							enabledWatchers.push(e);
 							e.$disabled = e.disabled;
 							return e.disabled === isNegated;
 						}
-						return pseudo==":enabled" ? isNegated : !isNegated;
+						return pseudo == ":enabled" ? isNegated : !isNegated;
 					}
 					break;
 					
@@ -227,8 +227,8 @@ References:
 								
 				case "hover":
 					if (!activateEventName) {
-						activateEventName = "mouseenter"
-						deactivateEventName = "mouseleave"
+						activateEventName = "mouseenter";
+						deactivateEventName = "mouseleave";
 					}
 					applyClass = function(e) {
 						addEvent( e, isNegated ? deactivateEventName : activateEventName, function() {
@@ -266,7 +266,7 @@ References:
 		
 		// If the dom selector equates to an empty string or ends with 
 		// whitespace then we need to append a universal selector (*) to it.
-		if (domSelectorText == EMPTY_STRING || domSelectorText.charAt(domSelectorText.length-1) == SPACE_STRING) {
+		if (domSelectorText == EMPTY_STRING || domSelectorText.charAt(domSelectorText.length - 1) == SPACE_STRING) {
 			domSelectorText += "*";
 		}
 		
@@ -275,20 +275,20 @@ References:
 			elms = selectorMethod( domSelectorText );
 		} catch (ex) {
 			// #DEBUG_START
-			log( "Selector '" + selectorText + "' threw exception '"+ ex +"'" );
+			log( "Selector '" + selectorText + "' threw exception '" + ex + "'" );
 			// #DEBUG_END
 		}
 
 
 		if (elms) {
-			for (var d=0, dl=elms.length; d<dl; d++) {	
+			for (var d = 0, dl = elms.length; d < dl; d++) {	
 				var elm = elms[d];
 				var cssClasses = elm.className;
-				for (var f=0, fl=patches.length; f<fl; f++) {
+				for (var f = 0, fl = patches.length; f < fl; f++) {
 					var patch = patches[f];
 					
 					if (!hasPatch(elm, patch)) {
-						if (patch.applyClass && (patch.applyClass===true || patch.applyClass(elm)===true)) {
+						if (patch.applyClass && (patch.applyClass === true || patch.applyClass(elm) === true)) {
 							cssClasses = toggleClass(cssClasses, patch.className, true );
 						}
 					}
@@ -309,10 +309,10 @@ References:
 	// =========================== Utility =================================
 	
 	function createClassName( className ) {
-		return namespace + "-" + ((ieVersion==6 && patchIE6MultipleClasses) ?
+		return namespace + "-" + ((ieVersion == 6 && patchIE6MultipleClasses) ?
 			ie6PatchID++
 		:
-			className.replace(RE_PATCH_CLASS_NAME_REPLACE, function(a){return a.charCodeAt(0)}));
+			className.replace(RE_PATCH_CLASS_NAME_REPLACE, function(a) { return a.charCodeAt(0) }));
 	};
 
 	// --[ log() ]----------------------------------------------------------
@@ -371,7 +371,7 @@ References:
 	
 	// --[ addEvent() ]-----------------------------------------------------
 	function addEvent(elm, eventName, eventHandler) {
-		elm.attachEvent("on"+eventName, eventHandler);
+		elm.attachEvent("on" + eventName, eventHandler);
 	};
 
 
@@ -416,7 +416,7 @@ References:
 
 		// relative path
 		var contextUrlPath = contextUrl.split("?")[0]; // ignore query string in the contextUrl	
-		if (url.charAt(0)!="?" && contextUrlPath.charAt(contextUrlPath.length-1) != "/") {
+		if (url.charAt(0) != "?" && contextUrlPath.charAt(contextUrlPath.length - 1) != "/") {
 			contextUrlPath = contextUrlPath.substring(0, contextUrlPath.lastIndexOf("/") + 1);
 		}
 		
@@ -448,7 +448,7 @@ References:
 		// honour the <base> tag
 		var url, stylesheet;
 		var baseTags = doc.getElementsByTagName("BASE");
-		var baseUrl = (baseTags.length>0) ? baseTags[0].href : doc.location.href;
+		var baseUrl = (baseTags.length > 0) ? baseTags[0].href : doc.location.href;
 		
 		/* Note: This code prevents IE from freezing / crashing when using 
 		@font-face .eot files but it modifies the <head> tag and could
@@ -475,7 +475,7 @@ References:
 		}
 		*/
 		
-		for (var c=0; c<doc.styleSheets.length; c++) {
+		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c]
 			if (stylesheet.href != EMPTY_STRING) {
 				url = resolveUrl(stylesheet.href, baseUrl);
@@ -487,9 +487,9 @@ References:
 		
 		// :enabled & :disabled polling script (since we can't hook 
 		// onpropertychange event when an element is disabled) 
-		if (enabledWatchers.length>0) {
+		if (enabledWatchers.length > 0) {
 			setInterval( function() {
-				for (var c=0, cl=enabledWatchers.length; c<cl; c++) {
+				for (var c = 0, cl = enabledWatchers.length; c < cl; c++) {
 					var e = enabledWatchers[c];
 					if (e.disabled !== e.$disabled) {
 						if (e.disabled) {
@@ -498,7 +498,7 @@ References:
 							e.disabled = true;
 						}
 						else {
-							e.$disabled=e.disabled;
+							e.$disabled = e.disabled;
 						}
 					}
 				}
@@ -512,7 +512,7 @@ References:
 	function determineSelectorMethod() {
 		var method
 		for (var engine in selectorEngines) {
-			if (win[engine] && (method = eval(selectorEngines[engine].replace("*",engine)))) {
+			if (win[engine] && (method = eval(selectorEngines[engine].replace("*", engine)))) {
 				return method;
 			}
 		}
@@ -520,9 +520,9 @@ References:
 	};
 	
 	// Emulate DOMReady event (Dean Edwards)
-	doc.write("<script id="+domReadyScriptID+" defer src='//:'><\/script>");
+	doc.write("<script id=" + domReadyScriptID + " defer src='//:'><\/script>");
 	doc.getElementById(domReadyScriptID).onreadystatechange = function() {
-		if (this.readyState=='complete') {
+		if (this.readyState == 'complete') {
 			selectorMethod = determineSelectorMethod();
 			if (selectorMethod) {
 				init();
