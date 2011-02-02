@@ -519,15 +519,51 @@ References:
 		return false
 	}
 	
-	// Emulate DOMReady event (Dean Edwards)
-	doc.write("<script id="+domReadyScriptID+" defer src='//:'><\/script>");
-	doc.getElementById(domReadyScriptID).onreadystatechange = function() {
-		if (this.readyState=='complete') {				
-			selectorMethod = determineSelectorMethod()
-			if (selectorMethod) {
-				init()
-				this.parentNode.removeChild(this)
-			}
+	// Emulate DOMReady event if possible, onreadystatechange (before onload) for iframes
+	var isReady = false;
+	
+	function onReady(fn) {
+		// Fire once
+		var fire = function () {
+				if (!isReady) {
+					isReady = true;
+					fn();
+				}
+			},
+			checkState = function() {
+				if (doc.readyState == 'complete') {
+					doc.onreadystatechange = null;
+					fire();
+				}
+			};
+		
+		// Already ready ?
+		checkState();
+		
+		// iframe or not ?
+		if(win.parent == win) {
+			(function () {
+				// doScroll Hack
+				try {
+					root.doScroll('left');
+				} catch (e) {
+					setTimeout(arguments.callee, 50);
+					return;
+				}
+				// Fire if no error
+				fire();
+			})();
 		}
+		
+		// Fire before onload
+		doc.onreadystatechange = checkState; 
 	}
+	
+	// Bind
+	onReady(function() {
+		selectorMethod = determineSelectorMethod();
+		if (selectorMethod) {
+			init();
+		}
+	});
 })(this)
