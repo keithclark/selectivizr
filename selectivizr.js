@@ -448,14 +448,8 @@ References:
 		// honour the <base> tag
 		var url, stylesheet;
 		var baseTags = doc.getElementsByTagName("BASE"),
-			baseUrl = (baseTags.length>0) ? baseTags[0].href : doc.location.href,
-			
-			// Doesn't like hashes ?
-			hashPosition = baseUrl.indexOf('#');
-		
-		if(~hashPosition) {
-			baseUrl = baseUrl.substr(0, hashPosition);
-		}
+			baseUrl = ((baseTags.length>0) ? baseTags[0].href : doc.location.href).replace(/#.*/, '');
+
 		
 		/* Note: This code prevents IE from freezing / crashing when using 
 		@font-face .eot files but it modifies the <head> tag and could
