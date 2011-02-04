@@ -447,8 +447,15 @@ References:
 	function init() {
 		// honour the <base> tag
 		var url, stylesheet;
-		var baseTags = doc.getElementsByTagName("BASE");
-		var baseUrl = (baseTags.length>0) ? baseTags[0].href : doc.location.href;
+		var baseTags = doc.getElementsByTagName("BASE"),
+			baseUrl = (baseTags.length>0) ? baseTags[0].href : doc.location.href,
+			
+			// Doesn't like hashes ?
+			hashPosition = baseUrl.indexOf('#');
+		
+		if(~hashPosition) {
+			baseUrl = baseUrl.substr(0, hashPosition);
+		}
 		
 		/* Note: This code prevents IE from freezing / crashing when using 
 		@font-face .eot files but it modifies the <head> tag and could
@@ -519,7 +526,7 @@ References:
 		return false
 	}
 	
-	// Emulate DOMReady event if possible, onreadystatechange (before onload) for iframes
+	// Emulate DOMReady event when possible, onreadystatechange for iframes
 	var isReady = false;
 	
 	function onReady(fn) {
