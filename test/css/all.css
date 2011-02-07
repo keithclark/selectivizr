@@ -1,0 +1,90 @@
+body {
+	margin: 20px;
+	font-size: 16px;
+}
+#test h1 {
+	margin: 50px 0 10px;
+	padding: 10px;
+	font-family: Monaco, monospace;
+	font-size: 20px;
+	color: #444;
+	background: #EEE;	
+}
+#test .dbl-class1.dbl-class2 {
+	font-weight: bold;
+	color: #00ff00;
+}
+#test a[rel] {
+	font-weight: bold;
+	color: #0000ff;
+}
+#test a[rel=appendix] {
+	font-weight: bold;
+	color: #ff00ff;
+}
+#test #nth-child p:nth-child(2) {
+	font-weight: bold;
+	color: #00ff00;
+}
+#test #nth-child-2n p:nth-child(2n) {
+	font-weight: bold;
+	color: #00ff00;
+}
+#test #first-child p:first-child {
+	font-weight: bold;
+	color: #00ff00;
+}
+#test #last-child p:last-child {
+	font-weight: bold;
+	color: #00ff00;
+}
+#test #enabled-disabled input:enabled {
+	border: 3px solid #00ff00;
+	color: #00ff00;
+}
+#test #enabled-disabled input:disabled {
+	border: 3px solid #ff0000;
+	color: #ff0000;
+}
+#test #checked input {
+	margin: 10px;
+	padding: 20px;
+	background: #FFF;
+	-webkit-appearance: none;
+	appearance: none;
+	border-radius: 20px;
+	-webkit-box-shadow: 0px 1px 2px #777;
+	box-shadow: inset 0px 1px 2px #777;
+}
+#test #checked input:checked {
+	color: #00ff00;
+	background: #00ff00;
+	-webkit-box-shadow: inset 0px 1px 5px #000;
+}
+
+#hover ul li:hover {
+	cursor: pointer;
+	font-weight: bold;
+	color: #00ff00;
+}
+#focus input {
+	border: 3px solid #CCC;
+	outline: none;
+}
+#focus input:focus {
+	border: 3px solid #00ff00;
+}
+#target a:target {
+	font-weight: bold;
+	color: #00ff00;	
+}
+#first-line p:first-line {
+	font-weight: bold;
+	font-size: 24px;
+	color: #00ff00;
+}
+#first-letter p:first-letter {
+	font-weight: bold;
+	font-size: 24px;
+	color: #00ff00;
+}

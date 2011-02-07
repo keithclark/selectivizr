@@ -1,0 +1,124 @@
+<!doctype html>  
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Selectivizr</title>
+	<link rel="stylesheet" href="css/reset.css?v=0" />
+	<link rel="stylesheet" href="css/qunit.css?v=0" />
+	<link rel="stylesheet" href="css/all.css?v=0" />
+</head>
+<body>
+	<h1 id="qunit-header">QUnit example</h1>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+	<div id="test">
+		<h1>.dbl-class1.dbl-class2 -> green</h1>
+		<div class="dbl-class1 dbl-class2">Lorem ipsum</div>
+		
+		<h1>a[rel] -> blue</h1>
+		<a rel="help">Lorem ipsum</a>
+		
+		<h1>a[rel=appendix] -> purple</h1>
+		<a rel="appendix">Lorem ipsum</a>
+		
+		<h1>p:nth-child(2) -> green</h1>
+		<div id="nth-child">
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+		</div>
+		
+		<h1>p:nth-child(2n) -> green</h1>
+		<div id="nth-child-2n">
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+		</div>
+		
+		<h1>p:first-child -> green</h1>
+		<div id="first-child">
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+		</div>
+		
+		<h1>p:last-child -> green</h1>
+		<div id="last-child">
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+			<p>Lorem ipsum</p>
+		</div>
+		
+		<h1>input:enabled -> green, input:disabled -> red</h1>
+		<div id="enabled-disabled">
+			<input type="text"/>
+			<input type="text" disabled="disabled"/>
+			<input type="text"/>
+			<input type="text" disabled/>
+		</div>
+		
+		<h1>input:checked -> green</h1>
+		<div id="checked">
+			<input type="checkbox"/>
+			<input type="checkbox" checked="checked"/>
+			<input type="checkbox"/>
+			<input type="checkbox" checked/>
+		</div>
+		
+		<h1>ul li:hover -> green</h1>
+		<div id="hover">
+			<ul>
+				<li>Lorem ipsum</li>
+				<li>Lorem ipsum</li>
+				<li>Lorem ipsum</li>
+			</ul>
+		</div>
+		
+		<h1>input:focus -> green</h1>
+		<div id="focus">
+			<input type="text"/>
+			<input type="text"/>
+			<input type="text"/>
+			<input type="text"/>
+		</div>
+		
+		<h1>a:target -> green</h1>
+		<div id="target">
+			<a href="#targeted" id="targeted">Click me</a>
+		</div>
+		
+		<h1>p:first-line -> green</h1>
+		<div id="first-line">
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			</p>
+		</div>
+		<h1>p:first-letter -> green</h1>
+		<div id="first-letter">
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+			</p>
+		</div>
+	</div>	
+	<script src="js/jquery.js"></script>
+	<script src="js/yepnope.js"></script>
+	<script src="js/qunit.js"></script>
+	<script type="text/javascript">
+	yepnope({
+		load: ['wait!ielt8!../selectivizr.js', 'js/test.js']
+	});
+	</script>
+</body>
+</html>
