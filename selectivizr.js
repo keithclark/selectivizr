@@ -36,7 +36,7 @@ References:
 	var doc = document;
 	var root = doc.documentElement;
 	var xhr = getXHRObject();
-	var ieVersion = /MSIE ([\d])/.exec(navigator.userAgent)[1];
+	var ieVersion = /MSIE (\d+)/.exec(navigator.userAgent)[1];
 	
 	// If were not in standards mode, IE is too old / new or we can't create
 	// an XMLHttpRequest object then we should get out now.
