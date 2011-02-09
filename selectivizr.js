@@ -415,7 +415,7 @@ References:
 		}
 
 		// relative path
-		var contextUrlPath = contextUrl.split("?")[0]; // ignore query string in the contextUrl	
+		var contextUrlPath = contextUrl.split(/[?#]/)[0]; // ignore query string in the contextUrl	
 		if (url.charAt(0) != "?" && contextUrlPath.charAt(contextUrlPath.length - 1) != "/") {
 			contextUrlPath = contextUrlPath.substring(0, contextUrlPath.lastIndexOf("/") + 1);
 		}
