@@ -197,6 +197,10 @@
 				<td><input class="ui" id="not-checked" type="checkbox"><span>:not(:checked)</span></td>
 			</tr>
 		</table>
+		<!--[if IE 6]>
+			<p class="warn">Please note: :focus, :enabled, :disabled and :checked will show as failures in IE6. This
+			is an issue with the test tool, not selectivizr.</p>
+		<![endif]-->
 		
 		<h3>Pseudo-class tests</h3>
 		<table border="1" width="100%">
@@ -220,7 +224,7 @@
 			</tr>
 			-->
 			<tr>
-				<td><b class="not-empty">empty test</b><span>:not(:empty)</span></td>
+				<td><b class="not-empty"> &nbsp; </b><span>:not(:empty)</span></td>
 			</tr>
 			<tr>
 				<td><b class="not-empty"><a></a></b><span>:not(:empty) (empty child tag)</span></td>

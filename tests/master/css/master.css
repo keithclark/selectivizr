@@ -37,7 +37,6 @@ body {
 	background: #c00 url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAAA3NCSVQICAjb4U/gAAAABlBMVEUAzAD///+JPJoHAAAACXBIWXMAAAsSAAALEgHS3X78AAAAFnRFWHRDcmVhdGlvbiBUaW1lADEyLzIwLzEwJjOU9gAAABh0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzT7MfTgAAAAxJREFUCJljYCANAAAAMAABQ5S3ZwAAAABJRU5ErkJggg==");
 }
 
-
 #target:target,
 html:root #root
 											{ background: #0c0 }
@@ -45,8 +44,11 @@ html:root #root
 /* pseudo-class tests
 ------------------------------------------------------------------------------------ */
 
-.empty:empty+span,
-.not-empty:not(:empty)+span
+#empty b { display: block; height:24px;}
+#empty span { margin-top:-24px; }
+
+.empty:empty,
+.not-empty:not(:empty)					
 											{ background: #0c0 }
 
 #first-child:first-child,
@@ -80,7 +82,13 @@ html:root #root
 ------------------------------------------------------------------------------------ */
 																			
 #hover:hover,
-#not-hover:not(:hover),
+#not-hover:not(:hover)
+											{ background: #0c0 } 
+
+/* IE6 doesn't support the '+' combinator so these will always fail so they have been 
+split from the rules declared above. Need to find a way to get these tests running 
+without using the '+' combinator so they run in IE6 */
+
 #checked:checked+span,
 #not-checked:not(:checked)+span,
 #enabled:enabled+span,

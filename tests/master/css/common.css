@@ -63,3 +63,10 @@ iframe {
 b {
 	display: none;
 }
+
+.warn {
+	background: #fc6;
+	padding: 4px 8px;
+	color: #000;
+	font-weight: bold;
+}
