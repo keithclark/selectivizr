@@ -1,4 +1,5 @@
 (function() {	
+	
 	// we need this for the HTML5 tests in IE
 	document.createElement("header");
 
@@ -7,6 +8,9 @@
 
 	// write a script tag to include the required selector library
 	document.write("<script src='" + selectedEngine + "'></scr" + "ipt>");
+
+	// hide the page so it doesn't jump around while we set test parameters
+	document.documentElement.style.marginTop = "-10000em";
 
 	// build the options menu 
 	window.onload = function() {
@@ -34,10 +38,13 @@
 			}
 		}
 	
-		// required for testing the :focus UI pseudo-class
+		// test the :target pseudo-class
+		location = "#target";
+		
+		// test the :focus UI pseudo-class
 		document.getElementById("focus").focus();
 	
-		// line above causes document to jump to focused element. This dirty hack jumps back to top.
-		setTimeout( function() { location="#"; }, 10);
+		// show the page
+		setTimeout( function() { document.documentElement.style.marginTop = 0; }, 10);
 	}
 }());
