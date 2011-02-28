@@ -4,7 +4,8 @@ selectivizr - change log
 
 current build
 -------------
-
+ * NEW - selectivizr can now be "lazy-loaded"
+ * NEW - Switched DOMReady back to Diego Perini's (new) ContentLoaded.
  * BUG - asset urls using the 'data:' scheme (i.e. background-image) resolved to a path (Chris Korhonen)
  * BUG - resolveUrl() failed if the context url contained a hash followed by a '/' (Zee Agency)
  * BUG - IE version detection wasn't IE>9 friendly (reported by Paul Irish)
