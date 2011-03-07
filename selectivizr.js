@@ -59,7 +59,7 @@ References:
 		"jQuery"							: "*",
 		"dojo"								: "*.query"
 	};
-	
+
 	var selectorMethod;
 	var enabledWatchers 					= [];     // array of :enabled/:disabled elements to poll
 	var ie6PatchID 							= 0;      // used to solve ie6's multiple class bug
@@ -139,7 +139,6 @@ References:
 			{ className: createClassName(attr), applyClass: true } : null;
 	};
 
-
 	// --[ patchPseudoClass() ]---------------------------------------------
 	// returns a patch for a pseudo-class
 	function patchPseudoClass( pseudo ) {
@@ -178,7 +177,7 @@ References:
 							var handler = function() { 
 								var hash = location.hash;
 								var hashID = hash.slice(1);
-								return isNegated ? (hash == "" || e.id != hashID) : (hash != "" && e.id == hashID);
+								return isNegated ? (hash == EMPTY_STRING || e.id != hashID) : (hash != EMPTY_STRING && e.id == hashID);
 							};
 							addEvent( win, "hashchange", function() {
 								toggleElementClass(e, className, handler());
@@ -298,7 +297,6 @@ References:
 		}
 	};
 
-
 	// --[ hasPatch() ]-----------------------------------------------------
 	// checks for the exsistence of a patch on an element
 	function hasPatch( elm, patch ) {
@@ -374,7 +372,6 @@ References:
 		elm.attachEvent("on" + eventName, eventHandler);
 	};
 
-
 	// --[ getXHRObject() ]-------------------------------------------------
 	function getXHRObject()
 	{
@@ -428,15 +425,13 @@ References:
 	// and recursivly replaces @import rules with their contents, ultimately
 	// returning the full cssText.
 	function parseStyleSheet( url ) {
-	
-		
 		if (url) {
 			return loadStyleSheet(url).replace(RE_COMMENT, EMPTY_STRING).
 			replace(RE_IMPORT, function( match, quoteChar, importUrl, quoteChar2, importUrl2 ) { 
 				return parseStyleSheet(resolveUrl(importUrl || importUrl2, url));
 			}).
 			replace(RE_ASSET_URL, function( match, quoteChar, assetUrl ) { 
-				quoteChar = quoteChar || "";
+				quoteChar = quoteChar || EMPTY_STRING;
 				return " url(" + quoteChar + resolveUrl(assetUrl, url) + quoteChar + ") "; 
 			});
 		}
@@ -506,18 +501,22 @@ References:
 		}
 	};
 	
-	// --[ determineSelectorMethod() ]--------------------------------------
-	// walks through the selectorEngines object testing for an suitable
-	// selector engine.
-	function determineSelectorMethod() {
-		var method
+	// Bind selectivizr to the ContentLoaded event. 
+	ContentLoaded(win, function() {
+		// Determine the "best fit" selector engine
 		for (var engine in selectorEngines) {
-			if (win[engine] && (method = eval(selectorEngines[engine].replace("*", engine)))) {
-				return method;
+			var members, member, context = win;
+			if (win[engine]) {
+				members = selectorEngines[engine].replace("*", engine).split(".");
+				while ((member = members.shift()) && (context = context[member])) {}
+				if (typeof context == "function") {
+					selectorMethod = context;
+					init();
+					return;
+				}
 			}
 		}
-		return false;
-	};
+	});
 	
 	
 	/*!
@@ -569,14 +568,4 @@ References:
 			win[add](pre + 'load', init, false);
 		}
 	};
-	
-	
-	// bind selectivizr to the DOMReady event
-	ContentLoaded(win, function() {
-		selectorMethod = determineSelectorMethod();
-		if (selectorMethod) {
-			init();
-		}
-	})
-	
 })(this);
