@@ -51,10 +51,10 @@ References:
 	// a placholder for the object key name. (basically, crude compression)
 	var selectorEngines = {
 		"NW"								: "*.Dom.select",
+		"MooTools"							: "$$",
 		"DOMAssistant"						: "*.$", 
 		"Prototype"							: "$$",
 		"YAHOO"								: "*.util.Selector.query",
-		"MooTools"							: "$$",
 		"Sizzle"							: "*", 
 		"jQuery"							: "*",
 		"dojo"								: "*.query"
