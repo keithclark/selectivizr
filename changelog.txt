@@ -4,6 +4,9 @@ selectivizr - change log
 
 current build
 -------------
+
+ * NEW - Removed the eval() from determineSelectorMethod() - YAY!
+ * BUG - selectivizr incorrectly detects Yahoo! profiler as YUI seletor library
  * NEW - selectivizr can now be "lazy-loaded"
  * NEW - Switched DOMReady back to Diego Perini's (new) ContentLoaded.
  * BUG - asset urls using the 'data:' scheme (i.e. background-image) resolved to a path (Chris Korhonen)
