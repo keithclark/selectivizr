@@ -65,7 +65,6 @@ References:
 	var ie6PatchID 							= 0;      // used to solve ie6's multiple class bug
 	var patchIE6MultipleClasses				= true;   // if true adds class bloat to ie6
 	var namespace 							= "slvzr";
-	var domReadyScriptID					= namespace + "DOMReady";
 	
 	// Stylesheet parsing regexp's
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*/g;
@@ -539,27 +538,24 @@ References:
 	function ContentLoaded(win, fn) {
 
 		var done = false, top = true,
-		doc = win.document, root = doc.documentElement,
-
 		init = function(e) {
-			if (e.type == 'readystatechange' && doc.readyState != 'complete') return;
-			(e.type == 'load' ? win : doc).detachEvent("on" + e.type, init, false);
+			if (e.type == "readystatechange" && doc.readyState != "complete") return;
+			(e.type == "load" ? win : doc).detachEvent("on" + e.type, init, false);
 			if (!done && (done = true)) fn.call(win, e.type || e);
 		},
-
 		poll = function() {
-			try { root.doScroll('left'); } catch(e) { setTimeout(poll, 50); return; }
+			try { root.doScroll("left"); } catch(e) { setTimeout(poll, 50); return; }
 			init('poll');
 		};
 
-		if (doc.readyState == 'complete') fn.call(win, '');
+		if (doc.readyState == "complete") fn.call(win, EMPTY_STRING);
 		else {
 			if (doc.createEventObject && root.doScroll) {
 				try { top = !win.frameElement; } catch(e) { }
 				if (top) poll();
 			}
-			doc.attachEvent('onreadystatechange', init, false);
-			win.attachEvent('onload', init, false);
+			addEvent(doc,"readystatechange", init);
+			addEvent(win,"load", init);
 		}
 	};
 })(this);

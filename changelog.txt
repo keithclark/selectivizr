@@ -2,16 +2,18 @@ selectivizr - change log
 ========================
 
 
-current build
--------------
+v1.0.2
+------
 
- * NEW - Removed the eval() from determineSelectorMethod() - YAY!
- * BUG - selectivizr incorrectly detects Yahoo! profiler as YUI seletor library
+ * BUG - fixed Google Closure Compiler issue that added 2 global vars - sorry about that!
+ * NEW - removed the eval() from determineSelectorMethod()
+ * BUG - selectivizr incorrectly detects Yahoo! profiler as YUI selector library
  * NEW - selectivizr can now be "lazy-loaded"
- * NEW - Switched DOMReady back to Diego Perini's (new) ContentLoaded.
+ * NEW - switched DOMReady back to Diego Perini's (new) ContentLoaded.
  * BUG - asset urls using the 'data:' scheme (i.e. background-image) resolved to a path (Chris Korhonen)
  * BUG - resolveUrl() failed if the context url contained a hash followed by a '/' (Zee Agency)
  * BUG - IE version detection wasn't IE>9 friendly (reported by Paul Irish)
+
 
 
 v1.0.1
@@ -20,6 +22,7 @@ v1.0.1
  * BUG - @import urls not wrapped with "url()" are now correctly processed 
  * BUG - relative urls are now correctly resolved
  * BUG - patched [*=""] selector in IE8 (returns elements it shouldn't)
+
 
 
 v1.0.0
