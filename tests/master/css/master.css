@@ -24,6 +24,17 @@
 @import url("/selectivizr-git/tests/master/css/import-url-root-relative-path.css");
 @import url("http://iis/selectivizr-git/tests/master/css/import-url-fully-qualified-path.css");	
 
+/* Check that media types are honoured and their defined styles don't mix */
+@import url("import-print.css") print;
+@import url("import-screen.css") screen;
+
+#import-print {
+	background: #0c0;
+}
+
+#import-screen {
+	background: #c00;
+}
 
 body {
 	padding: 10px;
@@ -37,12 +48,13 @@ body {
 	background: #c00 url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAAA3NCSVQICAjb4U/gAAAABlBMVEUAzAD///+JPJoHAAAACXBIWXMAAAsSAAALEgHS3X78AAAAFnRFWHRDcmVhdGlvbiBUaW1lADEyLzIwLzEwJjOU9gAAABh0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzT7MfTgAAAAxJREFUCJljYCANAAAAMAABQ5S3ZwAAAABJRU5ErkJggg==");
 }
 
-#target:target,
-html:root #root
-											{ background: #0c0 }
 											
 /* pseudo-class tests
 ------------------------------------------------------------------------------------ */
+
+#target:target,
+html:root #root
+											{ background: #0c0 }
 
 #empty b { display: block; height:24px;}
 #empty span { margin-top:-24px; }

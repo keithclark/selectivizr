@@ -68,7 +68,7 @@ References:
 	
 	// Stylesheet parsing regexp's
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*/g;
-	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))[^;]*;/g;
+	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
 	var RE_ASSET_URL 						= /\burl\(\s*(["']?)(?!data:)([^"')]+)\1\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g;
@@ -426,8 +426,9 @@ References:
 	function parseStyleSheet( url ) {
 		if (url) {
 			return loadStyleSheet(url).replace(RE_COMMENT, EMPTY_STRING).
-			replace(RE_IMPORT, function( match, quoteChar, importUrl, quoteChar2, importUrl2 ) { 
-				return parseStyleSheet(resolveUrl(importUrl || importUrl2, url));
+			replace(RE_IMPORT, function( match, quoteChar, importUrl, quoteChar2, importUrl2, media ) {
+				var cssText = parseStyleSheet(resolveUrl(importUrl || importUrl2, url));
+				return (media) ? "@media " + media + " {" + cssText + "}" : cssText;
 			}).
 			replace(RE_ASSET_URL, function( match, quoteChar, assetUrl ) { 
 				quoteChar = quoteChar || EMPTY_STRING;
@@ -468,7 +469,7 @@ References:
 			}
 		}
 		*/
-		
+
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c]
 			if (stylesheet.href != EMPTY_STRING) {
@@ -478,7 +479,7 @@ References:
 				}
 			}
 		}
-		
+
 		// :enabled & :disabled polling script (since we can't hook 
 		// onpropertychange event when an element is disabled) 
 		if (enabledWatchers.length > 0) {
@@ -499,7 +500,7 @@ References:
 			},250)
 		}
 	};
-	
+
 	// Bind selectivizr to the ContentLoaded event. 
 	ContentLoaded(win, function() {
 		// Determine the "best fit" selector engine

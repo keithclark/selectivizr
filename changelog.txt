@@ -1,6 +1,12 @@
 selectivizr - change log
 ========================
 
+Current Build
+-------------
+
+ * NEW - selectivizr now honours media specific @imports in style sheets
+
+
 
 v1.0.2
 ------
@@ -48,8 +54,8 @@ v0.9.6b
 -------
 
  * BUG - IE8 :target pseudo-class emulation fails with jQuery (but not with Sizzle) (reported by Tom Law)
- * BUG - ie-css3.js won't run if page is in an iframe (switched DOM Load detection to Dean Edwards defered script method)
- * BUG - A selector that begins with a attribute selector incorrected parsed (reported by Stephanie Sullivan)
+ * BUG - ie-css3.js won't run if page is in an iframe (switched DOM Load detection to Dean Edwards deferred script method)
+ * BUG - A selector that begins with a attribute selector incorrectly parsed (reported by Stephanie Sullivan)
 
 
 
@@ -72,7 +78,7 @@ v0.9.4b
  * NEW - added support for ::first-child and ::first-letter (suggested by Philip Renich)
  * BUG - style sheets without href values shouldn't get parsed (reported by Jeff Smith)
  * BUG - remotely hosted style sheets are now ignored when used in @imports
- * BUG - @import rules now honor the <base> href if its specified (reported by Andrea and Tim)
+ * BUG - @import rules now honour the <base> href if its specified (reported by Andrea and Tim)
  * BUG - various minor bug fixes 
 
 
@@ -93,7 +99,7 @@ v0.9.3b
  * BUG - Fixed extra spaces issue with modified class names.
  * BUG - Stopped triggering a DOM redraw when there are no className changes
  * Dynamic building of CSS_PSEUDOS regexp based on IE version so we only patch what's needed.
- * XHR compatability test (reported from twitter.com/kangax).
+ * XHR compatibility test (reported from twitter.com/kangax).
  * Reworked DOMLoaded detection.
 
  
