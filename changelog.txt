@@ -4,8 +4,8 @@ selectivizr - change log
 Current Build
 -------------
 
- * NEW - selectivizr now honours media specific @imports in style sheets
-
+ * NEW - selectivizr now honours media specific @imports in style sheets.
+ * BUG - comments placed between @import rules caused the import to fail.
 
 
 v1.0.2

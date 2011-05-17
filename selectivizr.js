@@ -1,5 +1,5 @@
 /*
-selectivizr v1.0.2b - (c) Keith Clark, freely distributable under the terms 
+selectivizr v1.0.3b - (c) Keith Clark, freely distributable under the terms 
 of the MIT license.
 
 selectivizr.com
@@ -67,7 +67,7 @@ References:
 	var namespace 							= "slvzr";
 	
 	// Stylesheet parsing regexp's
-	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*/g;
+	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
 	var RE_ASSET_URL 						= /\burl\(\s*(["']?)(?!data:)([^"')]+)\1\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
