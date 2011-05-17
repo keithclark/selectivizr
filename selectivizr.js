@@ -19,7 +19,7 @@ References:
  
  * CSS Syntax          : http://www.w3.org/TR/2003/WD-css3-syntax-20030813/#style
  * Selectors           : http://www.w3.org/TR/css3-selectors/#selectors
- * IE Compatability    : http://msdn.microsoft.com/en-us/library/cc351024(VS.85).aspx
+ * IE Compatibility    : http://msdn.microsoft.com/en-us/library/cc351024(VS.85).aspx
  * W3C Selector Tests  : http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/html/tests/
  
 */
@@ -47,8 +47,8 @@ References:
 	
 	// ========================= Common Objects ============================
 
-	// Compatiable selector engines in order of CSS3 support. Note: '*' is
-	// a placholder for the object key name. (basically, crude compression)
+	// Compatible selector engines in order of CSS3 support. Note: '*' is
+	// a placeholder for the object key name. (basically, crude compression)
 	var selectorEngines = {
 		"NW"								: "*.Dom.select",
 		"MooTools"							: "$$",
@@ -297,7 +297,7 @@ References:
 	};
 
 	// --[ hasPatch() ]-----------------------------------------------------
-	// checks for the exsistence of a patch on an element
+	// checks for the existence of a patch on an element
 	function hasPatch( elm, patch ) {
 		return new RegExp("(^|\\s)" + patch.className + "(\\s|$)").test(elm.className);
 	};
@@ -421,7 +421,7 @@ References:
 	
 	// --[ parseStyleSheet() ]----------------------------------------------
 	// Downloads the stylesheet specified by the URL, removes it's comments
-	// and recursivly replaces @import rules with their contents, ultimately
+	// and recursively replaces @import rules with their contents, ultimately
 	// returning the full cssText.
 	function parseStyleSheet( url ) {
 		if (url) {
