@@ -62,10 +62,11 @@ References:
 
 	var selectorMethod;
 	var enabledWatchers 					= [];     // array of :enabled/:disabled elements to poll
+	var domPatches							= [];
 	var ie6PatchID 							= 0;      // used to solve ie6's multiple class bug
 	var patchIE6MultipleClasses				= true;   // if true adds class bloat to ie6
 	var namespace 							= "slvzr";
-	
+
 	// Stylesheet parsing regexp's
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
@@ -111,7 +112,7 @@ References:
     					function(match, combinator, pseudo, attribute, index) {
     						if (combinator) {
     							if (patches.length>0) {
-    								applyPatches( selector.substring(0, index), patches );
+    								domPatches.push( { selector: selector.substring(0, index), patches: patches } )
     								patches = [];
     							}
     							return combinator;
@@ -253,45 +254,48 @@ References:
 	};
 
 	// --[ applyPatches() ]-------------------------------------------------
-	// uses the passed selector text to find DOM nodes and patch them	
-	function applyPatches(selectorText, patches) {
-		var elms;
-		
-		// Although some selector libraries can find :checked :enabled etc. 
-		// we need to find all elements that could have that state because 
-		// it can be changed by the user.
-		var domSelectorText = selectorText.replace(RE_LIBRARY_INCOMPATIBLE_PSEUDOS, EMPTY_STRING);
-		
-		// If the dom selector equates to an empty string or ends with 
-		// whitespace then we need to append a universal selector (*) to it.
-		if (domSelectorText == EMPTY_STRING || domSelectorText.charAt(domSelectorText.length - 1) == SPACE_STRING) {
-			domSelectorText += "*";
-		}
-		
-		// Ensure we catch errors from the selector library
-		try {
-			elms = selectorMethod( domSelectorText );
-		} catch (ex) {
-			// #DEBUG_START
-			log( "Selector '" + selectorText + "' threw exception '" + ex + "'" );
-			// #DEBUG_END
-		}
+	function applyPatches() {
+		var elms, selectorText, patches, domSelectorText;
+
+		for (var c=0; c<domPatches.length; c++) {
+			selectorText = domPatches[c].selector;
+			patches = domPatches[c].patches;
+
+			// Although some selector libraries can find :checked :enabled etc.
+			// we need to find all elements that could have that state because
+			// it can be changed by the user.
+			domSelectorText = selectorText.replace(RE_LIBRARY_INCOMPATIBLE_PSEUDOS, EMPTY_STRING);
+
+			// If the dom selector equates to an empty string or ends with
+			// whitespace then we need to append a universal selector (*) to it.
+			if (domSelectorText == EMPTY_STRING || domSelectorText.charAt(domSelectorText.length - 1) == SPACE_STRING) {
+				domSelectorText += "*";
+			}
+
+			// Ensure we catch errors from the selector library
+			try {
+				elms = selectorMethod( domSelectorText );
+			} catch (ex) {
+				// #DEBUG_START
+				log( "Selector '" + selectorText + "' threw exception '" + ex + "'" );
+				// #DEBUG_END
+			}
 
 
-		if (elms) {
-			for (var d = 0, dl = elms.length; d < dl; d++) {	
-				var elm = elms[d];
-				var cssClasses = elm.className;
-				for (var f = 0, fl = patches.length; f < fl; f++) {
-					var patch = patches[f];
-					
-					if (!hasPatch(elm, patch)) {
-						if (patch.applyClass && (patch.applyClass === true || patch.applyClass(elm) === true)) {
-							cssClasses = toggleClass(cssClasses, patch.className, true );
+			if (elms) {
+				for (var d = 0, dl = elms.length; d < dl; d++) {
+					var elm = elms[d];
+					var cssClasses = elm.className;
+					for (var f = 0, fl = patches.length; f < fl; f++) {
+						var patch = patches[f];
+						if (!hasPatch(elm, patch)) {
+							if (patch.applyClass && (patch.applyClass === true || patch.applyClass(elm) === true)) {
+								cssClasses = toggleClass(cssClasses, patch.className, true );
+							}
 						}
 					}
+					elm.className = cssClasses;
 				}
-				elm.className = cssClasses;
 			}
 		}
 	};
@@ -372,8 +376,7 @@ References:
 	};
 
 	// --[ getXHRObject() ]-------------------------------------------------
-	function getXHRObject()
-	{
+	function getXHRObject() {
 		if (win.XMLHttpRequest) {
 			return new XMLHttpRequest;
 		}
@@ -395,16 +398,20 @@ References:
 	// Converts a URL fragment to a fully qualified URL using the specified
 	// context URL. Returns null if same-origin policy is broken
 	function resolveUrl( url, contextUrl ) {
-	
+
 		function getProtocolAndHost( url ) {
 			return url.substring(0, url.indexOf("/", 8));
 		};
-		
+
+		if (!contextUrl) {
+			contextUrl = baseUrl;
+		}
+
 		// absolute path
 		if (/^https?:\/\//i.test(url)) {
 			return getProtocolAndHost(contextUrl) == getProtocolAndHost(url) ? url : null;
 		}
-		
+
 		// root-relative path
 		if (url.charAt(0)=="/")	{
 			return getProtocolAndHost(contextUrl) + url;
@@ -415,7 +422,7 @@ References:
 		if (url.charAt(0) != "?" && contextUrlPath.charAt(contextUrlPath.length - 1) != "/") {
 			contextUrlPath = contextUrlPath.substring(0, contextUrlPath.lastIndexOf("/") + 1);
 		}
-		
+
 		return contextUrlPath + url;
 	};
 	
@@ -437,48 +444,24 @@ References:
 		}
 		return EMPTY_STRING;
 	};
-	
+
+	// --[ getStyleSheets() ]-----------------------------------------------
+	function getStyleSheets() {
+		var url, stylesheet;
+		for (var c = 0; c < doc.styleSheets.length; c++) {
+			stylesheet = doc.styleSheets[c];
+			if (stylesheet.href != EMPTY_STRING) {
+				url = resolveUrl(stylesheet.href);
+				if (url) {
+					stylesheet.cssText = stylesheet.rawCssText = patchStyleSheet( parseStyleSheet( url ) );
+				}
+			}
+		}
+	};
+
 	// --[ init() ]---------------------------------------------------------
 	function init() {
-		// honour the <base> tag
-		var url, stylesheet;
-		var baseTags = doc.getElementsByTagName("BASE");
-		var baseUrl = (baseTags.length > 0) ? baseTags[0].href : doc.location.href;
-		
-		/* Note: This code prevents IE from freezing / crashing when using 
-		@font-face .eot files but it modifies the <head> tag and could
-		trigger the IE stylesheet limit. It will also cause FOUC issues.
-		If you choose to use it, make sure you comment out the for loop 
-		directly below this comment.
-
-		var head = doc.getElementsByTagName("head")[0];
-		for (var c=doc.styleSheets.length-1; c>=0; c--) {
-			stylesheet = doc.styleSheets[c]
-			head.appendChild(doc.createElement("style"))
-			var patchedStylesheet = doc.styleSheets[doc.styleSheets.length-1];
-			
-			if (stylesheet.href != EMPTY_STRING) {
-				url = resolveUrl(stylesheet.href, baseUrl)
-				if (url) {
-					patchedStylesheet.cssText = patchStyleSheet( parseStyleSheet( url ) )
-					stylesheet.disabled = true
-					setTimeout( function () {
-						stylesheet.owningElement.parentNode.removeChild(stylesheet.owningElement)
-					})
-				}
-			}
-		}
-		*/
-
-		for (var c = 0; c < doc.styleSheets.length; c++) {
-			stylesheet = doc.styleSheets[c]
-			if (stylesheet.href != EMPTY_STRING) {
-				url = resolveUrl(stylesheet.href, baseUrl);
-				if (url) {
-					stylesheet.cssText = patchStyleSheet( parseStyleSheet( url ) );
-				}
-			}
-		}
+		applyPatches();
 
 		// :enabled & :disabled polling script (since we can't hook 
 		// onpropertychange event when an element is disabled) 
@@ -497,9 +480,14 @@ References:
 						}
 					}
 				}
-			},250)
+			}, 250)
 		}
 	};
+
+	// Determine the baseUrl and download the stylesheets
+	var baseTags = doc.getElementsByTagName("BASE");
+	var baseUrl = (baseTags.length > 0) ? baseTags[0].href : doc.location.href;
+	getStyleSheets();
 
 	// Bind selectivizr to the ContentLoaded event. 
 	ContentLoaded(win, function() {
@@ -518,6 +506,7 @@ References:
 		}
 	});
 	
+
 	
 	/*!
 	 * ContentLoaded.js by Diego Perini, modified for IE<9 only (to save space)
