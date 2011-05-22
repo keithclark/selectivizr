@@ -41,11 +41,15 @@ body {
 }
 
 
-/* data scheme test
+/* url tests
 ------------------------------------------------------------------------------------ */
 
 #url-data {
 	background: #c00 url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAAA3NCSVQICAjb4U/gAAAABlBMVEUAzAD///+JPJoHAAAACXBIWXMAAAsSAAALEgHS3X78AAAAFnRFWHRDcmVhdGlvbiBUaW1lADEyLzIwLzEwJjOU9gAAABh0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzT7MfTgAAAAxJREFUCJljYCANAAAAMAABQ5S3ZwAAAABJRU5ErkJggg==");
+}
+
+#url-remote {
+	background: #c00 url("https://github.com/keithclark/selectivizr/raw/master/tests/master/css/nested/test.png");
 }
 
 											

@@ -397,7 +397,7 @@ References:
 	// --[ resolveUrl() ]---------------------------------------------------
 	// Converts a URL fragment to a fully qualified URL using the specified
 	// context URL. Returns null if same-origin policy is broken
-	function resolveUrl( url, contextUrl ) {
+	function resolveUrl( url, contextUrl, ignoreSameOriginPolicy ) {
 
 		function getProtocolAndHost( url ) {
 			return url.substring(0, url.indexOf("/", 8));
@@ -409,7 +409,7 @@ References:
 
 		// absolute path
 		if (/^https?:\/\//i.test(url)) {
-			return getProtocolAndHost(contextUrl) == getProtocolAndHost(url) ? url : null;
+			return !ignoreSameOriginPolicy || getProtocolAndHost(contextUrl) == getProtocolAndHost(url) ? url : null;
 		}
 
 		// root-relative path
@@ -434,7 +434,7 @@ References:
 		if (url) {
 			return loadStyleSheet(url).replace(RE_COMMENT, EMPTY_STRING).
 			replace(RE_IMPORT, function( match, quoteChar, importUrl, quoteChar2, importUrl2, media ) {
-				var cssText = parseStyleSheet(resolveUrl(importUrl || importUrl2, url));
+				var cssText = parseStyleSheet(resolveUrl(importUrl || importUrl2, url, true));
 				return (media) ? "@media " + media + " {" + cssText + "}" : cssText;
 			}).
 			replace(RE_ASSET_URL, function( match, quoteChar, assetUrl ) { 
