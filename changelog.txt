@@ -4,6 +4,7 @@ selectivizr - change log
 Current Build
 -------------
 
+ * BUG - resolveUrl() incorrectly fails external assets urls for violating the same origin policy
  * CHG - selectivizr MUST now be included AFTER all <link>'d stylesheets!
  * BUG - IE fails to render page (WSOD (White Screen of Death)) under certain conditions
  * BUG - @font-face can cause IE to hang when processing CSS files after DOM load
