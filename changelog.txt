@@ -4,6 +4,8 @@ selectivizr - change log
 Current Build
 -------------
 
+ * NEW - expose selectiviz'd cssText through styleSheet object via 'rawCssText' expando property
+ * BUG - incorrect parsing of @media blocks (fixes respondJS compatibility issue)
  * BUG - resolveUrl() incorrectly fails external assets urls for violating the same origin policy
  * CHG - selectivizr MUST now be included AFTER all <link>'d stylesheets!
  * BUG - IE fails to render page (WSOD (White Screen of Death)) under certain conditions
