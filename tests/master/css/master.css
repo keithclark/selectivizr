@@ -22,7 +22,8 @@
  */
 
 @import url("/selectivizr-git/tests/master/css/import-url-root-relative-path.css");
-@import url("http://iis/selectivizr-git/tests/master/css/import-url-fully-qualified-path.css");	
+@import url("http://iis/selectivizr-git/tests/master/css/import-url-fully-qualified-path.css");
+@import url("//iis/selectivizr-git/tests/master/css/import-url-protocol-relative-path.css");
 
 /* Check that media types are honoured and their defined styles don't mix */
 @import url("import-print.css") print;

@@ -399,6 +399,10 @@ References:
 	// context URL. Returns null if same-origin policy is broken
 	function resolveUrl( url, contextUrl, ignoreSameOriginPolicy ) {
 
+		function getProtocol( url ) {
+			return url.substring(0, url.indexOf("//"));
+		};
+
 		function getProtocolAndHost( url ) {
 			return url.substring(0, url.indexOf("/", 8));
 		};
@@ -410,6 +414,11 @@ References:
 		// absolute path
 		if (/^https?:\/\//i.test(url)) {
 			return !ignoreSameOriginPolicy || getProtocolAndHost(contextUrl) == getProtocolAndHost(url) ? url : null;
+		}
+
+		// protocol-relative path
+		if (url.substring(0,2)=="//") {
+			return getProtocol(contextUrl) + url;
 		}
 
 		// root-relative path
