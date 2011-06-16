@@ -4,6 +4,7 @@ selectivizr - change log
 Current Build
 -------------
 
+ * BUG - resolveUrl() fails to resolve protocol relative urls
  * NEW - expose selectiviz'd cssText through styleSheet object via 'rawCssText' expando property
  * BUG - incorrect parsing of @media blocks (fixes respondJS compatibility issue)
  * BUG - resolveUrl() incorrectly fails external assets urls for violating the same origin policy
