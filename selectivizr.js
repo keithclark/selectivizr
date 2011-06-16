@@ -411,14 +411,14 @@ References:
 			contextUrl = baseUrl;
 		}
 
-		// absolute path
-		if (/^https?:\/\//i.test(url)) {
-			return !ignoreSameOriginPolicy || getProtocolAndHost(contextUrl) == getProtocolAndHost(url) ? url : null;
-		}
-
 		// protocol-relative path
 		if (url.substring(0,2)=="//") {
-			return getProtocol(contextUrl) + url;
+			url = getProtocol(contextUrl) + url;
+		}
+
+		// absolute path
+		if (/^https?:\/\//i.test(url)) {
+			return !ignoreSameOriginPolicy && getProtocolAndHost(contextUrl) != getProtocolAndHost(url) ? null : url ;
 		}
 
 		// root-relative path
@@ -443,12 +443,12 @@ References:
 		if (url) {
 			return loadStyleSheet(url).replace(RE_COMMENT, EMPTY_STRING).
 			replace(RE_IMPORT, function( match, quoteChar, importUrl, quoteChar2, importUrl2, media ) {
-				var cssText = parseStyleSheet(resolveUrl(importUrl || importUrl2, url, true));
+				var cssText = parseStyleSheet(resolveUrl(importUrl || importUrl2, url));
 				return (media) ? "@media " + media + " {" + cssText + "}" : cssText;
 			}).
 			replace(RE_ASSET_URL, function( match, quoteChar, assetUrl ) { 
 				quoteChar = quoteChar || EMPTY_STRING;
-				return " url(" + quoteChar + resolveUrl(assetUrl, url) + quoteChar + ") "; 
+				return " url(" + quoteChar + resolveUrl(assetUrl, url, true) + quoteChar + ") "; 
 			});
 		}
 		return EMPTY_STRING;
