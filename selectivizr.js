@@ -70,7 +70,7 @@ References:
 	// Stylesheet parsing regexp's
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
-	var RE_ASSET_URL 						= /\burl\(\s*(["']?)(?!data:)([^"')]+)\1\s*\)/g;
+	var RE_ASSET_URL 						= /(behavior\s*?:\s*)?\burl\(\s*(["']?)(?!data:)([^"')]+)\2\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g;
 	var RE_SELECTOR_GROUP					= /((?:^|(?:\s*})+)(?:\s*@media[^{]+{)?)\s*([^\{]*?[\[:][^{]+)/g;
@@ -446,9 +446,9 @@ References:
 				var cssText = parseStyleSheet(resolveUrl(importUrl || importUrl2, url));
 				return (media) ? "@media " + media + " {" + cssText + "}" : cssText;
 			}).
-			replace(RE_ASSET_URL, function( match, quoteChar, assetUrl ) { 
+			replace(RE_ASSET_URL, function( match, isBehavior, quoteChar, assetUrl ) { 
 				quoteChar = quoteChar || EMPTY_STRING;
-				return " url(" + quoteChar + resolveUrl(assetUrl, url, true) + quoteChar + ") "; 
+				return isBehavior ? match : " url(" + quoteChar + resolveUrl(assetUrl, url, true) + quoteChar + ") "; 
 			});
 		}
 		return EMPTY_STRING;

@@ -53,6 +53,9 @@ body {
 	background: #c00 url("https://github.com/keithclark/selectivizr/raw/master/tests/master/css/nested/test.png");
 }
 
+#url-htc {
+	behavior: url(htc/test.htc);
+}
 											
 /* pseudo-class tests
 ------------------------------------------------------------------------------------ */
