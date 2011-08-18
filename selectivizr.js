@@ -462,7 +462,7 @@ References:
 			if (stylesheet.href != EMPTY_STRING) {
 				url = resolveUrl(stylesheet.href);
 				if (url) {
-					stylesheet.cssText = stylesheet.rawCssText = patchStyleSheet( parseStyleSheet( url ) );
+					stylesheet.cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
 				}
 			}
 		}
