@@ -30,7 +30,7 @@ References:
 	// handles the script being loaded by non IE browsers because the
 	// developer didn't use conditional comments.
 	var result = navigator.userAgent.match(/MSIE (\d+)/);
-	if (result) var ieVersion = result[1]; else return;
+	if (result !== null) var ieVersion = result[1]; else return;
 
 	// =========================== Init Objects ============================
 
