@@ -29,15 +29,18 @@ References:
 	// Determine IE version and stop execution if browser isn't IE. This
 	// handles the script being loaded by non IE browsers because the
 	// developer didn't use conditional comments.
-	var result = navigator.userAgent.match(/MSIE (\d+)/);
-	if (result !== null) var ieVersion = result[1]; else return;
+	var ieUserAgent = navigator.userAgent.match(/MSIE (\d+)/);
+	if (!ieUserAgent) {
+		return false;
+	}
 
 	// =========================== Init Objects ============================
 
 	var doc = document;
 	var root = doc.documentElement;
 	var xhr = getXHRObject();
-	
+	var ieVersion = ieUserAgent[1];
+
 	// If were not in standards mode, IE is too old / new or we can't create
 	// an XMLHttpRequest object then we should get out now.
 	if (doc.compatMode != 'CSS1Compat' || ieVersion<6 || ieVersion>8 || !xhr) {
