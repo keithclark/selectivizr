@@ -407,7 +407,8 @@ References:
 		};
 
 		function getProtocolAndHost( url ) {
-			return url.substring(0, url.indexOf("/", 8));
+			var index = url.indexOf("/", 8);
+			return index > -1 ? url.substring(0, index) : url;
 		};
 
 		if (!contextUrl) {
