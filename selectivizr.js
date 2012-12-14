@@ -40,6 +40,9 @@ References:
 	var root = doc.documentElement;
 	var xhr = getXHRObject();
 	var ieVersion = ieUserAgent[1];
+	var styleSheetCache = {};
+
+	window.selectivizrUpdate = applyPatches;
 
 	// If were not in standards mode, IE is too old / new or we can't create
 	// an XMLHttpRequest object then we should get out now.
@@ -392,9 +395,13 @@ References:
 
 	// --[ loadStyleSheet() ]-----------------------------------------------
 	function loadStyleSheet( url ) {
-		xhr.open("GET", url, false);
-		xhr.send();
-		return (xhr.status==200) ? xhr.responseText : EMPTY_STRING;	
+		if ( !styleSheetCache[url] ) {
+			xhr.open("GET", url, false);
+			xhr.send();
+			styleSheetCache[url] = (xhr.status==200) ? xhr.responseText : EMPTY_STRING;
+		}
+		
+		return styleSheetCache[url];	
 	};
 	
 	// --[ resolveUrl() ]---------------------------------------------------
