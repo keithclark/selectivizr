@@ -461,7 +461,11 @@ References:
 			stylesheet = doc.styleSheets[c];
 			if (stylesheet.href != EMPTY_STRING) {
 				url = resolveUrl(stylesheet.href);
-				if (url) {
+				
+				var attr = 'data-donotparse';
+				
+				if (stylesheet.href != EMPTY_STRING && (typeof stylesheet.owningElement.getAttribute(attr) === "undefined" || stylesheet.owningElement.getAttribute(attr) !== "true" )) {
+				
 					stylesheet.cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
 				}
 			}
