@@ -27,3 +27,10 @@ Then add the following conditional comment:
 
 This adds the `selectivizr.js` and fallback CSS file to IE6-8 while hiding
 for other browsers.
+
+
+Added option to ignore a stylesheet, which is useful when using font-face
+
+	<link rel="stylesheet" media="screen" href="/_styles/main.css" />
+	<link rel="stylesheet" media="screen" href="/_styles/fonts.css" data-donotparse="true" />
+	
