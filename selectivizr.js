@@ -443,7 +443,7 @@ References:
 	// and recursivly replaces @import rules with their contents, ultimately
 	// returning the full cssText.
 	function parseStyleSheet( url ) {
-		if (url) {
+		if (url && url.indexOf(".css") !== -1) {
 			return loadStyleSheet(url).replace(RE_COMMENT, EMPTY_STRING).
 			replace(RE_IMPORT, function( match, quoteChar, importUrl, quoteChar2, importUrl2, media ) {
 				var cssText = parseStyleSheet(resolveUrl(importUrl || importUrl2, url));
@@ -464,7 +464,11 @@ References:
 			stylesheet = doc.styleSheets[c];
 			if (stylesheet.href != EMPTY_STRING) {
 				url = resolveUrl(stylesheet.href);
-				if (url) {
+				
+				var attr = 'data-donotparse';
+				
+				if (stylesheet.href != EMPTY_STRING && (typeof stylesheet.owningElement.getAttribute(attr) === "undefined" || stylesheet.owningElement.getAttribute(attr) !== "true" )) {
+				
 					stylesheet.cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
 				}
 			}
