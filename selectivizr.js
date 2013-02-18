@@ -462,7 +462,7 @@ References:
 			if (stylesheet.href != EMPTY_STRING) {
 				url = resolveUrl(stylesheet.href);
 				
-				var attr = 'data-donotparse';
+				var attr = 'data-youshallnotparse';
 				
 				if (stylesheet.href != EMPTY_STRING && (typeof stylesheet.owningElement.getAttribute(attr) === "undefined" || stylesheet.owningElement.getAttribute(attr) !== "true" )) {
 				
