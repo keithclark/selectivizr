@@ -261,45 +261,54 @@ References:
 		var elms, selectorText, patches, domSelectorText;
 
 		for (var c=0; c<domPatches.length; c++) {
-			selectorText = domPatches[c].selector;
-			patches = domPatches[c].patches;
 
-			// Although some selector libraries can find :checked :enabled etc.
-			// we need to find all elements that could have that state because
-			// it can be changed by the user.
-			domSelectorText = selectorText.replace(RE_LIBRARY_INCOMPATIBLE_PSEUDOS, EMPTY_STRING);
+			(function(){
 
-			// If the dom selector equates to an empty string or ends with
-			// whitespace then we need to append a universal selector (*) to it.
-			if (domSelectorText == EMPTY_STRING || domSelectorText.charAt(domSelectorText.length - 1) == SPACE_STRING) {
-				domSelectorText += "*";
-			}
+				var iterator = c;
+				
+				setTimeout(function(){
 
-			// Ensure we catch errors from the selector library
-			try {
-				elms = selectorMethod( domSelectorText );
-			} catch (ex) {
-				// #DEBUG_START
-				log( "Selector '" + selectorText + "' threw exception '" + ex + "'" );
-				// #DEBUG_END
-			}
+					selectorText = domPatches[iterator].selector;
+					patches = domPatches[iterator].patches;
+
+					// Although some selector libraries can find :checked :enabled etc.
+					// we need to find all elements that could have that state because
+					// it can be changed by the user.
+					domSelectorText = selectorText.replace(RE_LIBRARY_INCOMPATIBLE_PSEUDOS, EMPTY_STRING);
+
+					// If the dom selector equates to an empty string or ends with
+					// whitespace then we need to append a universal selector (*) to it.
+					if (domSelectorText == EMPTY_STRING || domSelectorText.charAt(domSelectorText.length - 1) == SPACE_STRING) {
+						domSelectorText += "*";
+					}
+
+					// Ensure we catch errors from the selector library
+					try {
+						elms = selectorMethod( domSelectorText );
+					} catch (ex) {
+						// #DEBUG_START
+						log( "Selector '" + selectorText + "' threw exception '" + ex + "'" );
+						// #DEBUG_END
+					}
 
 
-			if (elms) {
-				for (var d = 0, dl = elms.length; d < dl; d++) {
-					var elm = elms[d];
-					var cssClasses = elm.className;
-					for (var f = 0, fl = patches.length; f < fl; f++) {
-						var patch = patches[f];
-						if (!hasPatch(elm, patch)) {
-							if (patch.applyClass && (patch.applyClass === true || patch.applyClass(elm) === true)) {
-								cssClasses = toggleClass(cssClasses, patch.className, true );
+					if (elms) {
+						for (var d = 0, dl = elms.length; d < dl; d++) {
+							var elm = elms[d];
+							var cssClasses = elm.className;
+							for (var f = 0, fl = patches.length; f < fl; f++) {
+								var patch = patches[f];
+								if (!hasPatch(elm, patch)) {
+									if (patch.applyClass && (patch.applyClass === true || patch.applyClass(elm) === true)) {
+										cssClasses = toggleClass(cssClasses, patch.className, true );
+									}
+								}
 							}
+							elm.className = cssClasses;
 						}
 					}
-					elm.className = cssClasses;
-				}
-			}
+				}, 0);
+			})();
 		}
 	};
 
