@@ -64,22 +64,22 @@ References:
 	};
 
 	var selectorMethod;
-	var enabledWatchers 					= [];     // array of :enabled/:disabled elements to poll
+	var enabledWatchers						= [];     // array of :enabled/:disabled elements to poll
 	var domPatches							= [];
-	var ie6PatchID 							= 0;      // used to solve ie6's multiple class bug
+	var ie6PatchID							= 0;      // used to solve ie6's multiple class bug
 	var patchIE6MultipleClasses				= true;   // if true adds class bloat to ie6
-	var namespace 							= "slvzr";
+	var namespace							= "slvzr";
 
 	// Stylesheet parsing regexp's
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
-	var RE_ASSET_URL 						= /(behavior\s*?:\s*)?\burl\(\s*(["']?)(?!data:)([^"')]+)\2\s*\)/g;
+	var RE_ASSET_URL						= /(behavior\s*?:\s*)?\burl\(\s*(["']?)(?!data:)([^"')]+)\2\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g;
-	var RE_SELECTOR_GROUP					= /((?:^|(?:\s*})+)(?:\s*@media[^{]+{)?)\s*([^\{]*?[\[:][^{]+)/g;
-	var RE_SELECTOR_PARSE					= /([ +~>])|(:[a-z-]+(?:\(.*?\)+)?)|(\[.*?\])/g; 
+	var RE_SELECTOR_GROUP					= /((?:^|(?:\s*\})+)(?:\s*@media[^{]+\{)?)\s*([^\{]*?[\[:][^\{]+)/g;
+	var RE_SELECTOR_PARSE					= /([ +~>])|(:[a-z\-]+(?:\(.*?\)+)?)|(\[.*?\])/g; 
 	var RE_LIBRARY_INCOMPATIBLE_PSEUDOS		= /(:not\()?:(hover|enabled|disabled|focus|checked|target|active|visited|first-line|first-letter)\)?/g;
-	var RE_PATCH_CLASS_NAME_REPLACE			= /[^\w-]/g;
+	var RE_PATCH_CLASS_NAME_REPLACE			= /[^\w\-]/g;
 	
 	// HTML UI element regexp's
 	var RE_INPUT_ELEMENTS					= /^(INPUT|SELECT|TEXTAREA|BUTTON)$/;
@@ -107,40 +107,42 @@ References:
 	function patchStyleSheet( cssText ) {
 		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
-    			var selectorGroups = selectorText.split(",");
-    			for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
-    				var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
-    				var patches = [];
-    				selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, 
-    					function(match, combinator, pseudo, attribute, index) {
-    						if (combinator) {
-    							if (patches.length>0) {
-    								domPatches.push( { selector: selector.substring(0, index), patches: patches } )
-    								patches = [];
-    							}
-    							return combinator;
-    						}		
-    						else {
-    							var patch = (pseudo) ? patchPseudoClass( pseudo ) : patchAttribute( attribute );
-    							if (patch) {
-    								patches.push(patch);
-    								return "." + patch.className;
-    							}
-    							return match;
-    						}
-    					}
-    				);
-    			}
-    			return prefix + selectorGroups.join(",");
-    		});
-	};
+				var selectorGroups = selectorText.split(","),
+					selector,
+					patches,
+					selectorReplaceFunc = function(match, combinator, pseudo, attribute, index) {
+							if (combinator) {
+								if (patches.length>0) {
+									domPatches.push( { selector: selector.substring(0, index), patches: patches } );
+									patches = [];
+								}
+								return combinator;
+							}		
+							else {
+								var patch = (pseudo) ? patchPseudoClass( pseudo ) : patchAttribute( attribute );
+								if (patch) {
+									patches.push(patch);
+									return "." + patch.className;
+								}
+								return match;
+							}
+						};
+
+				for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
+					selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
+					patches = [];
+					selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, selectorReplaceFunc);
+				}
+				return prefix + selectorGroups.join(",");
+			});
+	}
 
 	// --[ patchAttribute() ]-----------------------------------------------
 	// returns a patch for an attribute selector.
 	function patchAttribute( attr ) {
 		return (!BROKEN_ATTR_IMPLEMENTATIONS || BROKEN_ATTR_IMPLEMENTATIONS.test(attr)) ? 
 			{ className: createClassName(attr), applyClass: true } : null;
-	};
+	}
 
 	// --[ patchPseudoClass() ]---------------------------------------------
 	// returns a patch for a pseudo-class
@@ -151,6 +153,29 @@ References:
 		var isNegated = pseudo.substring(0, 5) == ":not(";
 		var activateEventName;
 		var deactivateEventName;
+		var disabledEnabledApplyClass = function(e) { 
+				if (RE_INPUT_ELEMENTS.test(e.tagName)) {
+					addEvent( e, "propertychange", function() {
+						if (event.propertyName == "$disabled") {
+							toggleElementClass( e, className, e.$disabled === isNegated );
+						} 
+					});
+					enabledWatchers.push(e);
+					e.$disabled = e.disabled;
+					return e.disabled === isNegated;
+				}
+				return pseudo == ":enabled" ? isNegated : !isNegated;
+			};
+		var focusHoverApplyClass = function(e) {
+				addEvent( e, isNegated ? deactivateEventName : activateEventName, function() {
+					toggleElementClass( e, className, true );
+				});
+				addEvent( e, isNegated ? activateEventName : deactivateEventName, function() {
+					toggleElementClass( e, className, false );
+				});
+				return isNegated;
+			};
+
 
 		// if negated, remove :not() 
 		if (isNegated) {
@@ -158,7 +183,7 @@ References:
 		}
 		
 		// bracket contents are irrelevant - remove them
-		var bracketIndex = pseudo.indexOf("(")
+		var bracketIndex = pseudo.indexOf("(");
 		if (bracketIndex > -1) {
 			pseudo = pseudo.substring(0, bracketIndex);
 		}		
@@ -170,7 +195,7 @@ References:
 				case "root":
 					applyClass = function(e) {
 						return isNegated ? e != root : e == root;
-					}
+					};
 					break;
 
 				case "target":
@@ -184,9 +209,9 @@ References:
 							};
 							addEvent( win, "hashchange", function() {
 								toggleElementClass(e, className, handler());
-							})
+							});
 							return handler();
-						}
+						};
 						break;
 					}
 					return false;
@@ -197,50 +222,32 @@ References:
 							addEvent( e, "propertychange", function() {
 								if (event.propertyName == "checked") {
 									toggleElementClass( e, className, e.checked !== isNegated );
-								} 							
-							})
+								}
+							});
 						}
 						return e.checked !== isNegated;
-					}
+					};
 					break;
 					
 				case "disabled":
 					isNegated = !isNegated;
+					applyClass = disabledEnabledApplyClass;
+					break;
 
 				case "enabled":
-					applyClass = function(e) { 
-						if (RE_INPUT_ELEMENTS.test(e.tagName)) {
-							addEvent( e, "propertychange", function() {
-								if (event.propertyName == "$disabled") {
-									toggleElementClass( e, className, e.$disabled === isNegated );
-								} 
-							});
-							enabledWatchers.push(e);
-							e.$disabled = e.disabled;
-							return e.disabled === isNegated;
-						}
-						return pseudo == ":enabled" ? isNegated : !isNegated;
-					}
+					applyClass = disabledEnabledApplyClass;
 					break;
 					
 				case "focus":
 					activateEventName = "focus";
 					deactivateEventName = "blur";
+					applyClass = focusHoverApplyClass;
+					break;
 								
 				case "hover":
-					if (!activateEventName) {
-						activateEventName = "mouseenter";
-						deactivateEventName = "mouseleave";
-					}
-					applyClass = function(e) {
-						addEvent( e, isNegated ? deactivateEventName : activateEventName, function() {
-							toggleElementClass( e, className, true );
-						})
-						addEvent( e, isNegated ? activateEventName : deactivateEventName, function() {
-							toggleElementClass( e, className, false );
-						})
-						return isNegated;
-					}
+					activateEventName = "mouseenter";
+					deactivateEventName = "mouseleave";
+					applyClass = focusHoverApplyClass;
 					break;
 					
 				// everything else
@@ -254,7 +261,7 @@ References:
 			}
 		}
 		return { className: className, applyClass: applyClass };
-	};
+	}
 
 	// --[ applyPatches() ]-------------------------------------------------
 	function applyPatches() {
@@ -301,13 +308,13 @@ References:
 				}
 			}
 		}
-	};
+	}
 
 	// --[ hasPatch() ]-----------------------------------------------------
 	// checks for the exsistence of a patch on an element
 	function hasPatch( elm, patch ) {
 		return new RegExp("(^|\\s)" + patch.className + "(\\s|$)").test(elm.className);
-	};
+	}
 	
 	
 	// =========================== Utility =================================
@@ -316,8 +323,8 @@ References:
 		return namespace + "-" + ((ieVersion == 6 && patchIE6MultipleClasses) ?
 			ie6PatchID++
 		:
-			className.replace(RE_PATCH_CLASS_NAME_REPLACE, function(a) { return a.charCodeAt(0) }));
-	};
+			className.replace(RE_PATCH_CLASS_NAME_REPLACE, function(a) { return a.charCodeAt(0); }));
+	}
 
 	// --[ log() ]----------------------------------------------------------
 	// #DEBUG_START
@@ -325,20 +332,20 @@ References:
 		if (win.console) {
 			win.console.log(message);
 		}
-	};
+	}
 	// #DEBUG_END
 
 	// --[ trim() ]---------------------------------------------------------
 	// removes leading, trailing whitespace from a string
 	function trim( text ) {
 		return text.replace(RE_TIDY_TRIM_WHITESPACE, PLACEHOLDER_STRING);
-	};
+	}
 
 	// --[ normalizeWhitespace() ]------------------------------------------
 	// removes leading, trailing and consecutive whitespace from a string
 	function normalizeWhitespace( text ) {
 		return trim(text).replace(RE_TIDY_CONSECUTIVE_WHITESPACE, SPACE_STRING);
-	};
+	}
 
 	// --[ normalizeSelectorWhitespace() ]----------------------------------
 	// tidies whitespace around selector brackets and combinators
@@ -347,7 +354,7 @@ References:
 			replace(RE_TIDY_TRAILING_WHITESPACE, PLACEHOLDER_STRING).
 			replace(RE_TIDY_LEADING_WHITESPACE, PLACEHOLDER_STRING)
 		);
-	};
+	}
 
 	// --[ toggleElementClass() ]-------------------------------------------
 	// toggles a single className on an element
@@ -358,7 +365,7 @@ References:
 			elm.className = newClassName;
 			elm.parentNode.className += EMPTY_STRING;
 		}
-	};
+	}
 
 	// --[ toggleClass() ]--------------------------------------------------
 	// adds / removes a className from a string of classNames. Used to 
@@ -371,31 +378,31 @@ References:
 		} else {
 			return classExists ? trim(classList.replace(re, PLACEHOLDER_STRING)) : classList;
 		}
-	};
+	}
 	
 	// --[ addEvent() ]-----------------------------------------------------
 	function addEvent(elm, eventName, eventHandler) {
 		elm.attachEvent("on" + eventName, eventHandler);
-	};
+	}
 
 	// --[ getXHRObject() ]-------------------------------------------------
 	function getXHRObject() {
 		if (win.XMLHttpRequest) {
-			return new XMLHttpRequest;
+			return new XMLHttpRequest();
 		}
 		try	{ 
 			return new ActiveXObject('Microsoft.XMLHTTP');
 		} catch(e) { 
 			return null;
 		}
-	};
+	}
 
 	// --[ loadStyleSheet() ]-----------------------------------------------
 	function loadStyleSheet( url ) {
 		xhr.open("GET", url, false);
 		xhr.send();
 		return (xhr.status==200) ? xhr.responseText : EMPTY_STRING;	
-	};
+	}
 	
 	// --[ resolveUrl() ]---------------------------------------------------
 	// Converts a URL fragment to a fully qualified URL using the specified
@@ -404,11 +411,11 @@ References:
 
 		function getProtocol( url ) {
 			return url.substring(0, url.indexOf("//"));
-		};
+		}
 
 		function getProtocolAndHost( url ) {
 			return url.substring(0, url.indexOf("/", 8));
-		};
+		}
 
 		if (!contextUrl) {
 			contextUrl = baseUrl;
@@ -436,7 +443,7 @@ References:
 		}
 
 		return contextUrlPath + url;
-	};
+	}
 	
 	// --[ parseStyleSheet() ]----------------------------------------------
 	// Downloads the stylesheet specified by the URL, removes it's comments
@@ -455,7 +462,7 @@ References:
 			});
 		}
 		return EMPTY_STRING;
-	};
+	}
 
 	// --[ getStyleSheets() ]-----------------------------------------------
 	function getStyleSheets() {
@@ -465,11 +472,11 @@ References:
 			if (stylesheet.href != EMPTY_STRING) {
 				url = resolveUrl(stylesheet.href);
 				if (url) {
-					stylesheet.cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
+					stylesheet.cssText = stylesheet.rawCssText = patchStyleSheet( parseStyleSheet( url ) );
 				}
 			}
 		}
-	};
+	}
 
 	// --[ init() ]---------------------------------------------------------
 	function init() {
@@ -492,9 +499,9 @@ References:
 						}
 					}
 				}
-			}, 250)
+			}, 250);
 		}
-	};
+	}
 
 	// Determine the baseUrl and download the stylesheets
 	var baseTags = doc.getElementsByTagName("BASE");
@@ -559,5 +566,5 @@ References:
 			addEvent(doc,"readystatechange", init);
 			addEvent(win,"load", init);
 		}
-	};
+	}
 })(this);
