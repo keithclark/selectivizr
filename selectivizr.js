@@ -462,7 +462,7 @@ References:
 		var url, stylesheet;
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
-			if (stylesheet.href != EMPTY_STRING) {
+			if (stylesheet.href && (stylesheet.href != EMPTY_STRING)) {
 				url = resolveUrl(stylesheet.href);
 				if (url) {
 					stylesheet.cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
