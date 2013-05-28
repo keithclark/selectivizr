@@ -29,13 +29,25 @@
 @import url("import-print.css") print;
 @import url("import-screen.css") screen;
 
-#import-print {
-	background: #0c0;
-}
+/* When parsing @import of minified CSS, ensure the Regex isn't too greedy */
+@import url("min-import-url-quoted-double.css");.minified{background:url("css/nested/test.png");}
+@import url('min-import-url-quoted-single.css');.minified{background:url("css/nested/test.png");}
+@import url(min-import-url-unquoted.css);.minified{background:url("css/nested/test.png");}
+@import "min-import-quoted-double.css";.minified{background:url("css/nested/test.png");}
+@import "min-import-quoted-single.css";.minified{background:url("css/nested/test.png");}
+@import url("nested/min-import-url-relative-path.css");.minified{background:url("css/nested/test.png");}
+/* 
+ * The following urls will be specific to your own server configuration and will fail  
+ * if used "out of the box". To test root-relative and fully qualifed url's you will 
+ * need to adjust the paths below:
+ */
 
-#import-screen {
-	background: #c00;
-}
+@import url("/selectivizr-git/tests/master/css/min-import-url-root-relative-path.css");.minified{background:url("css/nested/test.png");}
+@import url("http://iis/selectivizr-git/tests/master/css/min-import-url-fully-qualified-path.css");.minified{background:url("css/nested/test.png");}
+@import url("//iis/selectivizr-git/tests/master/css/min-import-url-protocol-relative-path.css");.minified{background:url("css/nested/test.png");}
+
+@import url("min-import-print.css") print;.minified{background:url("css/nested/test.png");}
+@import url("min-import-screen.css") screen;.minified{background:url("css/nested/test.png");}
 
 body {
 	padding: 10px;
