@@ -29,13 +29,7 @@
 @import url("import-print.css") print;
 @import url("import-screen.css") screen;
 
-#import-print {
-	background: #0c0;
-}
 
-#import-screen {
-	background: #c00;
-}
 
 body {
 	padding: 10px;
