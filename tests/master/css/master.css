@@ -12,7 +12,7 @@
 @import url('import-url-quoted-single.css');
 @import url(import-url-unquoted.css);
 @import "import-quoted-double.css";
-@import "import-quoted-single.css";
+@import 'import-quoted-single.css';
 @import url("nested/import-url-relative-path.css");
 
 /* 
