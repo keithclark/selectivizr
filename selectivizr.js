@@ -267,7 +267,7 @@ References:
 			// Although some selector libraries can find :checked :enabled etc.
 			// we need to find all elements that could have that state because
 			// it can be changed by the user.
-			domSelectorText = selectorText.replace(RE_LIBRARY_INCOMPATIBLE_PSEUDOS, EMPTY_STRING);
+			domSelectorText = selectorText.replace(RE_LIBRARY_INCOMPATIBLE_PSEUDOS, EMPTY_STRING).replace(/:before|:after/, '');
 
 			// If the dom selector equates to an empty string or ends with
 			// whitespace then we need to append a universal selector (*) to it.
