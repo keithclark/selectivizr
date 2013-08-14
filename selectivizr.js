@@ -24,7 +24,7 @@ References:
  
 */
 
-(function(win) {
+Selectivizr = (function(win) {
 
 	// Determine IE version and stop execution if browser isn't IE. This
 	// handles the script being loaded by non IE browsers because the
@@ -560,4 +560,6 @@ References:
 			addEvent(win,"load", init);
 		}
 	};
+
+	return {init: init};
 })(this);
