@@ -26,27 +26,20 @@ References:
 
 (function(win) {
 
-	// Determine IE version and stop execution if browser isn't IE. This
-	// handles the script being loaded by non IE browsers because the
-	// developer didn't use conditional comments.
-	var ieUserAgent = navigator.userAgent.match(/MSIE (\d+)/);
-	if (!ieUserAgent) {
-		return false;
-	}
-
 	// =========================== Init Objects ============================
 
 	var doc = document;
 	var root = doc.documentElement;
-	var xhr = getXHRObject();
-	var ieVersion = ieUserAgent[1];
+	var xhr = "XMLHttpRequest";
+	var ieVersion = doc.querySelector ? doc.documentMode : (doc.compatMode == "CSS1Compat" ? xhr in win ? 7 : 6 : 5);
 
 	// If were not in standards mode, IE is too old / new or we can't create
-	// an XMLHttpRequest object then we should get out now.
-	if (doc.compatMode != 'CSS1Compat' || ieVersion<6 || ieVersion>8 || !xhr) {
+	if ( !(ieVersion>5 && ieVersion<9) ) {
 		return;
 	}
 	
+	// an XMLHttpRequest object then we should get out now.
+	xhr = ieVersion > 6 ? new win[xhr] : new ActiveXObject("Microsoft.XMLHTTP");
 	
 	// ========================= Common Objects ============================
 
@@ -73,7 +66,7 @@ References:
 	// Stylesheet parsing regexp's
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
-	var RE_ASSET_URL 						= /(behavior\s*?:\s*)?\burl\(\s*(["']?)(?!data:)([^"')]+)\2\s*\)/g;
+	var RE_ASSET_URL 						= /(behavior\s*?:\s*)?\burl\(\s*(["']?)(?!\w+:)([^"')]+)\2\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g;
 	var RE_SELECTOR_GROUP					= /((?:^|(?:\s*})+)(?:\s*@media[^{]+{)?)\s*([^\{]*?[\[:][^{]+)/g;
@@ -376,18 +369,6 @@ References:
 	// --[ addEvent() ]-----------------------------------------------------
 	function addEvent(elm, eventName, eventHandler) {
 		elm.attachEvent("on" + eventName, eventHandler);
-	};
-
-	// --[ getXHRObject() ]-------------------------------------------------
-	function getXHRObject() {
-		if (win.XMLHttpRequest) {
-			return new XMLHttpRequest;
-		}
-		try	{ 
-			return new ActiveXObject('Microsoft.XMLHTTP');
-		} catch(e) { 
-			return null;
-		}
 	};
 
 	// --[ loadStyleSheet() ]-----------------------------------------------
