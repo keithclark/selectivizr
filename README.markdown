@@ -20,7 +20,7 @@ To use the library, you'll need to include one of the supported libraries:
   
 Then add the following conditional comment _AFTER_ your stylesheets:
 
-	<!--[if (gte IE 6)&(lte IE 8)]>
+	<!--[if lte IE 8]>
 	  <script type="text/javascript" src="selectivizr.js"></script>
 	  <noscript><link rel="stylesheet" href="[fallback css]" /></noscript>
 	<![endif]-->
