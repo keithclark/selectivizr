@@ -394,7 +394,7 @@ References:
 	function loadStyleSheet( url ) {
 		xhr.open("GET", url, false);
 		xhr.send();
-		return (xhr.status==200) ? xhr.responseText : EMPTY_STRING;	
+		return (xhr.status==200) ? (xhr.responseText != null ? xhr.responseText : EMPTY_STRING) : EMPTY_STRING;	
 	};
 	
 	// --[ resolveUrl() ]---------------------------------------------------
