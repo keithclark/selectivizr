@@ -94,15 +94,16 @@ References:
 	var PLACEHOLDER_STRING					= "$1";
 
 	//PIE
-	var PIE_PATH							= win.PIE && PIE.behavior ? "behavior: url(" + PIE.behavior + ");" : EMPTY_STRING;
-	// =========================== Patching ================================
+	var js_path								= doc.scripts[doc.scripts.length - 1].getAttribute("src").replace(/[^\/]+$/, "");
+	var pie_path							= win.PIE && "behavior" in PIE ? PIE.behavior : js_path.replace(RE_ORIGIN, "") + "PIE.htc";
 
+	// =========================== Patching ================================
 	// --[ patchStyleSheet() ]----------------------------------------------
 	// Scans the passed cssText for selectors that require emulation and
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
-		if(PIE_PATH){
-			cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|box-shadow|pie-background)\s*:[^{}]+})/g, "{" + PIE_PATH);
+		if(pie_path){
+			cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|box-shadow|pie-background)\s*:[^{}]+})/g, "{" + pie_path);
 		}
 		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
@@ -505,14 +506,26 @@ References:
 					}
 				}, 250);
 			}
-		} else if(PIE_PATH){
+		} else if(pie_path){
 			if(enabledWatchers.length){
 				var stylesheet = doc.createElement("style");
-				stylesheet.appendChild(doc.createTextNode(enabledWatchers.join(",") + "{" + PIE_PATH + "}"));
+				stylesheet.appendChild(doc.createTextNode(enabledWatchers.join(",") + "{" + pie_path + "}"));
 				doc.documentElement.firstChild.insertAdjacentElement("afterBegin", stylesheet);
 			}
 		}
+		if(pie_path && !win.PIE){
+			eval.call(win, loadStyleSheet(js_path));
+		}
 	};
+
+	if(loadStyleSheet(pie_path)){
+		var script = doc.createElement("script");
+		js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
+		doc.documentElement.firstChild.appendChild(script);
+		pie_path = "behavior: url(" + (pie_path) + ");";
+	} else {
+		pie_path = EMPTY_STRING;
+	}
 
 	// Determine the baseUrl and download the stylesheets
 	var baseTags = doc.getElementsByTagName("BASE");
