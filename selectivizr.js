@@ -34,12 +34,12 @@ References:
 	var ieVersion = doc.querySelector ? doc.documentMode : (doc.compatMode == "CSS1Compat" ? xhr in win ? 7 : 6 : 5);
 
 	// If were not in standards mode, IE is too old / new or we can't create
-	if ( !(ieVersion>5 && ieVersion<9) ) {
+	if ( !(ieVersion>5 && ieVersion<10) ) {
 		return;
 	}
 	
 	// an XMLHttpRequest object then we should get out now.
-	xhr = ieVersion > 6 ? new win[xhr] : new ActiveXObject("Microsoft.XMLHTTP");
+	xhr = ieVersion < 7 ? new ActiveXObject("Microsoft.XMLHTTP") : new win[xhr];
 	
 	// ========================= Common Objects ============================
 
@@ -62,11 +62,12 @@ References:
 	var ie6PatchID 							= 0;      // used to solve ie6's multiple class bug
 	var patchIE6MultipleClasses				= true;   // if true adds class bloat to ie6
 	var namespace 							= "slvzr";
+	var re_css3prop							= ieVersion < 9 ? /\b(border-radius|box-shadow|pie-background)\s*:/g : /\blinear-gradient\s*\(/g;
 
 	// Stylesheet parsing regexp's
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
-	var RE_ASSET_URL 						= /(behavior\s*?:[^;}\n\r]+)?\burl\(\s*(["']?)(?!\w+:)([^"')]+)\2\s*\)/g;
+	var RE_ASSET_URL 						= /(\bbehavior\s*?:[^;}\n\r]+)?\burl\(\s*(["']?)(?!\w+:)([^"')]+)\2\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g;
 	var RE_SELECTOR_GROUP					= /((?:^|(?:\s*})+)(?:\s*@media[^{]+{)?)\s*([^\{]*?[\[:][^{]+)/g;
@@ -98,6 +99,15 @@ References:
 	// Scans the passed cssText for selectors that require emulation and
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
+		if(win.PIE && PIE.behavior){
+			cssText = cssText.replace(/{[^{}]+}/g, function(props){
+				if(!/\bbehavior\s*:/.test(props) && re_css3prop.test(props)){
+					return props.replace(/;*\s*}$/, "; behavior: url(\"" + PIE.behavior + "\");}");
+				} else {
+					return props;
+				}
+			});
+		}
 		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
     			var selectorGroups = selectorText.split(",");
@@ -373,9 +383,13 @@ References:
 
 	// --[ loadStyleSheet() ]-----------------------------------------------
 	function loadStyleSheet( url ) {
+		var cssText;
 		xhr.open("GET", url, false);
 		xhr.send();
-		return (xhr.status==200) ? xhr.responseText : EMPTY_STRING;	
+		if(xhr.status === 200){
+			cssText = xhr.responseText;
+		}
+		return cssText || EMPTY_STRING;	
 	};
 	
 	// --[ resolveUrl() ]---------------------------------------------------
@@ -443,7 +457,7 @@ References:
 		var url, stylesheet;
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
-			if (stylesheet.href != EMPTY_STRING) {
+			if (stylesheet.href && !stylesheet["rawCssText"]) {
 				url = resolveUrl(stylesheet.href);
 				if (url) {
 					stylesheet.cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
@@ -454,27 +468,34 @@ References:
 
 	// --[ init() ]---------------------------------------------------------
 	function init() {
-		applyPatches();
+		getStyleSheets();
 
-		// :enabled & :disabled polling script (since we can't hook 
-		// onpropertychange event when an element is disabled) 
-		if (enabledWatchers.length > 0) {
-			setInterval( function() {
-				for (var c = 0, cl = enabledWatchers.length; c < cl; c++) {
-					var e = enabledWatchers[c];
-					if (e.disabled !== e.$disabled) {
-						if (e.disabled) {
-							e.disabled = false;
-							e.$disabled = true;
-							e.disabled = true;
-						}
-						else {
-							e.$disabled = e.disabled;
+		// If were not in standards mode, IE is too old / new or we can't create
+		if ( ieVersion < 9 ) {
+
+			applyPatches();
+
+			// :enabled & :disabled polling script (since we can't hook 
+			// onpropertychange event when an element is disabled) 
+			if (enabledWatchers.length > 0) {
+				setInterval( function() {
+					for (var c = 0, cl = enabledWatchers.length; c < cl; c++) {
+						var e = enabledWatchers[c];
+						if (e.disabled !== e.$disabled) {
+							if (e.disabled) {
+								e.disabled = false;
+								e.$disabled = true;
+								e.disabled = true;
+							}
+							else {
+								e.$disabled = e.disabled;
+							}
 						}
 					}
-				}
-			}, 250)
+				}, 250);
+			}
 		}
+
 	};
 
 	// Determine the baseUrl and download the stylesheets
@@ -483,7 +504,7 @@ References:
 	getStyleSheets();
 
 	// Bind selectivizr to the ContentLoaded event. 
-	ContentLoaded(win, function() {
+	ContentLoaded(function() {
 		// Determine the "best fit" selector engine
 		for (var engine in selectorEngines) {
 			var members, member, context = win;
@@ -517,27 +538,59 @@ References:
 
 	// @w window reference
 	// @f function reference
-	function ContentLoaded(win, fn) {
-
-		var done = false, top = true,
-		init = function(e) {
-			if (e.type == "readystatechange" && doc.readyState != "complete") return;
-			(e.type == "load" ? win : doc).detachEvent("on" + e.type, init, false);
-			if (!done && (done = true)) fn.call(win, e.type || e);
-		},
-		poll = function() {
-			try { root.doScroll("left"); } catch(e) { setTimeout(poll, 50); return; }
-			init('poll');
-		};
-
-		if (doc.readyState == "complete") fn.call(win, EMPTY_STRING);
-		else {
-			if (doc.createEventObject && root.doScroll) {
-				try { top = !win.frameElement; } catch(e) { }
-				if (top) poll();
+	function ContentLoaded(fn) {
+		var isReady = false;
+		function completed() {
+			// readyState === "complete" is good enough for us to call the dom ready in oldIE
+			if ( !isReady ) {
+				isReady = true;
+				fn();
 			}
-			addEvent(doc,"readystatechange", init);
-			addEvent(win,"load", init);
 		}
+		if ( doc.readyState === "complete" ) {
+			// Handle it asynchronously to allow scripts the opportunity to delay ready
+			setTimeout(completed);
+
+		// Standards-based browsers support DOMContentLoaded
+		} else if ( doc.addEventListener ) {
+			// Use the handy event callback
+			doc.addEventListener( "DOMContentLoaded", completed, false );
+
+		// If IE event model is used
+		} else {
+			// Ensure firing before onload, maybe late but safe also for iframes
+			doc.attachEvent( "onreadystatechange", function(){
+				if(doc.readyState === "complete" ){
+					completed();
+				}
+			} );
+
+			// If IE and not a frame
+			// continually check to see if the document is ready
+			var top = false;
+
+			try {
+				top = win.frameElement == null && doc.documentElement;
+			} catch(e) {}
+
+			if ( top && top.doScroll ) {
+				(function doScrollCheck() {
+					if ( !isReady ) {
+
+						try {
+							// Use the trick by Diego Perini
+							// http://javascript.nwbox.com/IEContentLoaded/
+							top.doScroll("left");
+						} catch(e) {
+							return setTimeout( doScrollCheck, 50 );
+						}
+
+						// and execute any waiting functions
+						completed();
+					}
+				})();
+			}
+		}
+
 	};
 })(this);
