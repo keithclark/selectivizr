@@ -62,9 +62,9 @@ References:
 	var ie6PatchID 							= 0;      // used to solve ie6's multiple class bug
 	var patchIE6MultipleClasses				= true;   // if true adds class bloat to ie6
 	var namespace 							= "slvzr";
-	var re_css3prop							= ieVersion < 9 ? /\b(border-radius|box-shadow|pie-background)\s*:/g : /\blinear-gradient\s*\(/g;
 
 	// Stylesheet parsing regexp's
+	var RE_ORIGIN							= /^\w+:\/\/[^\/]+/;
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
 	var RE_ASSET_URL 						= /(\bbehavior\s*?:[^;}\n\r]+)?\burl\(\s*(["']?)(?!\w+:)([^"')]+)\2\s*\)/g;
@@ -93,20 +93,16 @@ References:
 	var SPACE_STRING						= " ";
 	var PLACEHOLDER_STRING					= "$1";
 
+	//PIE
+	var PIE_PATH							= win.PIE && PIE.behavior ? "behavior: url(" + PIE.behavior + ");" : EMPTY_STRING;
 	// =========================== Patching ================================
 
 	// --[ patchStyleSheet() ]----------------------------------------------
 	// Scans the passed cssText for selectors that require emulation and
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
-		if(win.PIE && PIE.behavior){
-			cssText = cssText.replace(/{[^{}]+}/g, function(props){
-				if(!/\bbehavior\s*:/.test(props) && re_css3prop.test(props)){
-					return props.replace(/;*\s*}$/, "; behavior: url(\"" + PIE.behavior + "\");}");
-				} else {
-					return props;
-				}
-			});
+		if(PIE_PATH){
+			cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|box-shadow|pie-background)\s*:[^{}]+})/g, "{" + PIE_PATH);
 		}
 		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
@@ -384,12 +380,18 @@ References:
 	// --[ loadStyleSheet() ]-----------------------------------------------
 	function loadStyleSheet( url ) {
 		var cssText;
-		xhr.open("GET", url, false);
+		try {
+			xhr.open("GET", url, false);
+		} catch (ex) {
+			return RE_ORIGIN.test(url) ? loadStyleSheet(url.replace(RE_ORIGIN, "")) : EMPTY_STRING;
+		}
 		xhr.send();
 		if(xhr.status === 200){
 			cssText = xhr.responseText;
+		} else {
+			log(url + "\t Error:" +xhr.status);
 		}
-		return cssText || EMPTY_STRING;	
+		return cssText || EMPTY_STRING;
 	};
 	
 	// --[ resolveUrl() ]---------------------------------------------------
@@ -454,13 +456,22 @@ References:
 
 	// --[ getStyleSheets() ]-----------------------------------------------
 	function getStyleSheets() {
-		var url, stylesheet;
+		var url, stylesheet, cssText;
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
-			if (stylesheet.href && !stylesheet["rawCssText"]) {
-				url = resolveUrl(stylesheet.href);
-				if (url) {
-					stylesheet.cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
+			if (stylesheet.href && !("rawCssText" in stylesheet) ) {
+				url = resolveUrl(stylesheet.href) || stylesheet.href;
+				
+				if(ieVersion < 9){
+					cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
+					if(cssText){
+						stylesheet.cssText = cssText;
+					}
+				} else {
+					stylesheet["rawCssText"] = loadStyleSheet(url).replace(/\s*([^{}]+\S)\s*{[^{}]+\bpie-background(-\w+)?\s*:\s*linear-gradient\s*\([^{}]+}/g, function(s, selector){
+						enabledWatchers.push(selector);
+						return s;
+					});
 				}
 			}
 		}
@@ -494,8 +505,13 @@ References:
 					}
 				}, 250);
 			}
+		} else if(PIE_PATH){
+			if(enabledWatchers.length){
+				var stylesheet = doc.createElement("style");
+				stylesheet.appendChild(doc.createTextNode(enabledWatchers.join(",") + "{" + PIE_PATH + "}"));
+				doc.documentElement.firstChild.insertAdjacentElement("afterBegin", stylesheet);
+			}
 		}
-
 	};
 
 	// Determine the baseUrl and download the stylesheets
