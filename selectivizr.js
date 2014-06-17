@@ -480,6 +480,11 @@ References:
 
 	// --[ init() ]---------------------------------------------------------
 	function init() {
+
+		if(pie_path && !win.PIE){
+			eval.call(win, loadStyleSheet(js_path));
+		}
+
 		getStyleSheets();
 
 		// If were not in standards mode, IE is too old / new or we can't create
@@ -513,15 +518,14 @@ References:
 				doc.documentElement.firstChild.insertAdjacentElement("afterBegin", stylesheet);
 			}
 		}
-		if(pie_path && !win.PIE){
-			eval.call(win, loadStyleSheet(js_path));
-		}
 	};
 
 	if(loadStyleSheet(pie_path)){
-		var script = doc.createElement("script");
-		js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
-		doc.documentElement.firstChild.appendChild(script);
+		if(!win.PIE){
+			var script = doc.createElement("script");
+			js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
+			doc.documentElement.firstChild.appendChild(script);
+		}
 		pie_path = "behavior: url(" + (pie_path) + ");";
 	} else {
 		pie_path = EMPTY_STRING;
