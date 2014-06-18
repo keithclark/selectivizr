@@ -104,6 +104,9 @@ References:
 	function patchStyleSheet( cssText ) {
 		if(pie_path){
 			cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|box-shadow|pie-background)\s*:[^{}]+})/g, "{" + pie_path);
+			if(ieVersion < 7){
+				cssText = cssText.replace(/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g, "{" + pie_path);
+			}
 		}
 		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
@@ -319,6 +322,12 @@ References:
 			className.replace(RE_PATCH_CLASS_NAME_REPLACE, function(a) { return a.charCodeAt(0) }));
 	};
 
+	// --[ isDocComplete() ]-----------------------------------------------------
+	// checks doc.readyState
+	function isDocComplete() {
+		return doc.readyState === "complete";
+	};
+
 	// --[ log() ]----------------------------------------------------------
 	// #DEBUG_START
 	function log( message ) {
@@ -526,7 +535,7 @@ References:
 			js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
 			root.children[0].appendChild(script);
 		}
-		pie_path = "behavior: url(" + (pie_path) + ");";
+		pie_path = "behavior: url(" + (pie_path) + ");-pie-lazy-init:true;";
 	} else {
 		pie_path = EMPTY_STRING;
 	}
@@ -580,7 +589,7 @@ References:
 				fn();
 			}
 		}
-		if ( doc.readyState === "complete" ) {
+		if ( isDocComplete() ) {
 			// Handle it asynchronously to allow scripts the opportunity to delay ready
 			setTimeout(completed);
 
@@ -593,7 +602,7 @@ References:
 		} else {
 			// Ensure firing before onload, maybe late but safe also for iframes
 			doc.attachEvent( "onreadystatechange", function(){
-				if(doc.readyState === "complete" ){
+				if( isDocComplete() ){
 					completed();
 				}
 			} );
