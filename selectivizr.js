@@ -515,7 +515,7 @@ References:
 			if(enabledWatchers.length){
 				var stylesheet = doc.createElement("style");
 				stylesheet.appendChild(doc.createTextNode(enabledWatchers.join(",") + "{" + pie_path + "}"));
-				root.firstChild.insertAdjacentElement("afterBegin", stylesheet);
+				root.children[0].insertAdjacentElement("afterBegin", stylesheet);
 			}
 		}
 	};
@@ -524,7 +524,7 @@ References:
 		if(!win.PIE){
 			var script = doc.createElement("script");
 			js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
-			root.firstChild.appendChild(script);
+			root.children[0].appendChild(script);
 		}
 		pie_path = "behavior: url(" + (pie_path) + ");";
 	} else {
