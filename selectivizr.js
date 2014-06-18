@@ -37,7 +37,7 @@ References:
 	if ( !(ieVersion>5 && ieVersion<10) ) {
 		return;
 	}
-	
+
 	// an XMLHttpRequest object then we should get out now.
 	xhr = ieVersion < 7 ? new ActiveXObject("Microsoft.XMLHTTP") : new win[xhr];
 	
@@ -528,6 +528,8 @@ References:
 			}
 		}
 	};
+
+	toggleElementClass(root, "ie" + ieVersion, true);
 
 	if(loadStyleSheet(pie_path)){
 		if(!win.PIE){
