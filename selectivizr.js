@@ -103,12 +103,17 @@ References:
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
 		if(pie_path){
-			cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|box-shadow|pie-background)\s*:[^{}]+})/g, "{" + pie_path);
-			if(ieVersion < 7){
-				cssText = cssText.replace(/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g, "{" + pie_path);
+			cssText = cssText.replace(/{(([^{}]*)background(-\w+)?\s*:\s*(linear-gradient\s*\([^;]+))/g, function(str, props, propsPre, backSubVal, gradient){
+				return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
+			});
+			if(ieVersion < 9) {
+				cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g, "{" + pie_path);
+				if(ieVersion < 7){
+					cssText = cssText.replace(/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g, "{" + pie_path);
+				}
 			}
 		}
-		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
+		return ieVersion > 8 ? cssText : cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
     			var selectorGroups = selectorText.split(",");
     			for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
@@ -469,19 +474,12 @@ References:
 		var url, stylesheet, cssText;
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
-			if (stylesheet.href && !("rawCssText" in stylesheet) ) {
-				url = resolveUrl(stylesheet.href) || stylesheet.href;
-				
-				if(ieVersion < 9){
-					cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
-					if(cssText){
-						stylesheet.cssText = cssText;
-					}
-				} else {
-					stylesheet["rawCssText"] = loadStyleSheet(url).replace(/\s*([^{}]+\S)\s*{[^{}]+\bpie-background(-\w+)?\s*:\s*linear-gradient\s*\([^{}]+}/g, function(s, selector){
-						enabledWatchers.push(selector);
-						return s;
-					});
+			url = stylesheet.href;
+			if (url && !("rawCssText" in stylesheet) ) {
+				url = resolveUrl(url) || url;
+				cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
+				if(cssText){
+					stylesheet.cssText = cssText;
 				}
 			}
 		}
@@ -520,12 +518,6 @@ References:
 					}
 				}, 250);
 			}
-		} else if(pie_path){
-			if(enabledWatchers.length){
-				var stylesheet = doc.createElement("style");
-				stylesheet.appendChild(doc.createTextNode(enabledWatchers.join(",") + "{" + pie_path + "}"));
-				root.children[0].insertAdjacentElement("afterBegin", stylesheet);
-			}
 		}
 	};
 
@@ -537,7 +529,7 @@ References:
 			js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
 			root.children[0].appendChild(script);
 		}
-		pie_path = "behavior: url(" + (pie_path) + ");-pie-lazy-init:true;";
+		pie_path = "behavior: url(" + (pie_path) + ");";
 	} else {
 		pie_path = EMPTY_STRING;
 	}
@@ -562,6 +554,7 @@ References:
 				}
 			}
 		}
+		init();
 	});
 	
 	
