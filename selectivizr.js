@@ -523,15 +523,18 @@ References:
 
 	toggleElementClass(root, "ie" + ieVersion, true);
 
-	if(loadStyleSheet(pie_path)){
-		if(!win.PIE){
-			var script = doc.createElement("script");
-			js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
-			root.children[0].appendChild(script);
-		}
+	if(ieVersion < 8){
+		pie_path = "behavior: expression(this.runtimeStyle.behavior = \"none\",window.PIE&&PIE.attach(this));";
+	} else if(loadStyleSheet(pie_path)) {
 		pie_path = "behavior: url(" + (pie_path) + ");";
 	} else {
 		pie_path = EMPTY_STRING;
+	}
+
+	if(pie_path && !win.PIE){
+		var script = doc.createElement("script");
+		js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
+		root.children[0].appendChild(script);
 	}
 
 	// Determine the baseUrl and download the stylesheets
