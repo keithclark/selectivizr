@@ -471,6 +471,16 @@ References:
 
 	// --[ getStyleSheets() ]-----------------------------------------------
 	function getStyleSheets() {
+		if(ieVersion < 8 && win.PIE && !PIE.attach_ie67){
+			PIE.attach_ie67 = function(node){
+				(win.jQuery || function(fn){
+					fn();
+				})(function(){
+					PIE.attach(node);
+					node.runtimeStyle.behavior = "none";
+				});
+			}
+		}
 		var url, stylesheet, cssText;
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
@@ -524,7 +534,7 @@ References:
 	toggleElementClass(root, "ie" + ieVersion, true);
 
 	if(ieVersion < 8){
-		pie_path = "behavior: expression(this.runtimeStyle.behavior = \"none\",window.PIE&&PIE.attach(this));";
+		pie_path = "behavior: expression(window.PIE&&PIE.attach_ie67&&PIE.attach_ie67(this));";
 	} else if(loadStyleSheet(pie_path)) {
 		pie_path = "behavior: url(" + (pie_path) + ");";
 	} else {
