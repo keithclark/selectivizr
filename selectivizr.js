@@ -97,22 +97,60 @@ References:
 	var js_path								= doc.scripts[doc.scripts.length - 1].getAttribute("src").replace(/[^\/]+$/, "");
 	var pie_path							= win.PIE && "behavior" in PIE ? PIE.behavior : js_path.replace(RE_ORIGIN, "") + "PIE.htc";
 
+	function setLengthUnits(){
+		var	sizeTester = doc.createComment("fontSizeVal"),
+			vh = root.clientHeight / 100,
+			vw = root.clientWidth / 100,
+			viewport = {
+				vmax: Math.max(vh, vh),
+				vmin: Math.min(vh, vh),
+				vh: vh,
+				vw: vw
+			},
+			stylesheet,
+			cssText;
+		sizeTester.style.top = "1em";
+		root.appendChild(sizeTester);
+		viewport.rem = sizeTester.style.pixelTop;
+		root.removeChild(sizeTester);
+
+		for (var c = 0; c < doc.styleSheets.length; c++) {
+			stylesheet = doc.styleSheets[c];
+			cssText = stylesheet.rawCssText;
+			if (cssText) {
+				stylesheet.cssText = cssText.replace(/\b(\d+(\.\d+)?)(vw|vh|vmax|vmin|rem)\b/g, function(s, num, subNum, strUnit){
+					return (parseFloat(num) * viewport[strUnit] ) + "px";
+				});
+			}
+		}
+	}
+
 	// =========================== Patching ================================
 	// --[ patchStyleSheet() ]----------------------------------------------
 	// Scans the passed cssText for selectors that require emulation and
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
-		if(pie_path){
+
+		if(ieVersion < 10){
 			cssText = cssText.replace(/{(([^{}]*)background(-\w+)?\s*:\s*(linear-gradient\s*\([^;]+))/g, function(str, props, propsPre, backSubVal, gradient){
 				return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
 			});
 			if(ieVersion < 9) {
 				cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g, "{" + pie_path);
-				if(ieVersion < 7){
-					cssText = cssText.replace(/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g, "{" + pie_path);
+				if(ieVersion < 8){
+					cssText = cssText.replace(/display\s*:\s*inline-block;/g , function(s, pre, prop){
+						return s + "display: inline; *zoom: 1;";
+					});
+					if(ieVersion < 7){
+						cssText = cssText.replace(/(\w+-)?(position\s*:\s*)fixed/g , function(s, pre, prop){
+							return pre ? s : prop + "absolute";
+						}).replace(/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g, "{" + pie_path);
+					}
 				}
 			}
 		}
+
+
 		return ieVersion > 8 ? cssText : cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
     			var selectorGroups = selectorText.split(",");
@@ -481,18 +519,16 @@ References:
 				});
 			}
 		}
-		var url, stylesheet, cssText;
+		var url, stylesheet;
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
 			url = stylesheet.href;
 			if (url && !("rawCssText" in stylesheet) ) {
 				url = resolveUrl(url) || url;
-				cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
-				if(cssText){
-					stylesheet.cssText = cssText;
-				}
+				stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
 			}
 		}
+		setLengthUnits();
 	};
 
 	// --[ init() ]---------------------------------------------------------
@@ -552,6 +588,14 @@ References:
 	var baseUrl = (baseTags.length > 0) ? baseTags[0].href : doc.location.href;
 	getStyleSheets();
 
+	var timer;
+	if(ieVersion < 9){
+		win.attachEvent("onresize", function(){
+			clearTimeout(timer);
+			timer = setTimeout(setLengthUnits, 20);
+		});
+	}
+
 	// Bind selectivizr to the ContentLoaded event. 
 	ContentLoaded(function() {
 		// Determine the "best fit" selector engine
@@ -589,6 +633,9 @@ References:
 	// @w window reference
 	// @f function reference
 	function ContentLoaded(fn) {
+		if(win.jQuery){
+			return jQuery(fn);
+		}
 		var isReady = false;
 		function completed() {
 			// readyState === "complete" is good enough for us to call the dom ready in oldIE
