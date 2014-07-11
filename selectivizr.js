@@ -519,16 +519,21 @@ References:
 				});
 			}
 		}
-		var url, stylesheet;
+		var url, stylesheet, cssText;
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
 			url = stylesheet.href;
 			if (url && !("rawCssText" in stylesheet) ) {
 				url = resolveUrl(url) || url;
-				stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
+				cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
+				if(cssText && ieVersion > 8){
+					stylesheet.cssText = cssText;
+				}
 			}
 		}
-		setLengthUnits();
+		if(ieVersion < 9){
+			setLengthUnits();
+		}
 	};
 
 	// --[ init() ]---------------------------------------------------------
@@ -588,8 +593,8 @@ References:
 	var baseUrl = (baseTags.length > 0) ? baseTags[0].href : doc.location.href;
 	getStyleSheets();
 
-	var timer;
 	if(ieVersion < 9){
+		var timer;
 		win.attachEvent("onresize", function(){
 			clearTimeout(timer);
 			timer = setTimeout(setLengthUnits, 20);
