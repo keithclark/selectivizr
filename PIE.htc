@@ -21,4 +21,5 @@ function cleanup() {
 	}
 }
 </script>
+<script type="text/vbscript"></script>
 </PUBLIC:COMPONENT>
