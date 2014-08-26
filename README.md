@@ -20,3 +20,8 @@ Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是�
 	<script src="selectivizr.js"></script>
 <![endif]-->
 ```
+
+## 注意事项
+
+- 为推进大家写更规范的代码，请将css写入文件中，行内和页面内样式均不支持
+- 出现元素背景及边框消失的情况，请用 `position: relative;` 方式修正
