@@ -433,16 +433,27 @@ References:
 	// --[ loadStyleSheet() ]-----------------------------------------------
 	function loadStyleSheet( url ) {
 		var cssText;
-		try {
-			xhr.open("GET", url, false);
-		} catch (ex) {
-			return RE_ORIGIN.test(url) ? loadStyleSheet(url.replace(RE_ORIGIN, EMPTY_STRING)) : EMPTY_STRING;
+
+		if (window.jQuery) {
+			cssText = jQuery.ajax(url, {
+				dataType: "text",
+				async: false
+			}).responseText;
 		}
-		xhr.send();
-		if(xhr.status === 200){
-			cssText = xhr.responseText;
-		} else {
-			log(url + "\t Error:" +xhr.status);
+		if (!cssText) {
+			try {
+				xhr.open("GET", url, false);
+				xhr.send();
+				if (xhr.status === 200) {
+					cssText = xhr.responseText;
+				} else {
+					log(url + "\t Error:" + xhr.status);
+				}
+			} catch (ex) {
+				if(RE_ORIGIN.test(url)){
+					cssText = loadStyleSheet(url.replace(RE_ORIGIN, EMPTY_STRING));
+				}
+			}
 		}
 		return cssText || EMPTY_STRING;
 	};
@@ -470,7 +481,7 @@ References:
 		}
 
 		// absolute path
-		if (/^https?:\/\//i.test(url)) {
+		if (/^\w+:\/\//i.test(url)) {
 			return !ignoreSameOriginPolicy && getProtocolAndHost(contextUrl) != getProtocolAndHost(url) ? null : url ;
 		}
 
