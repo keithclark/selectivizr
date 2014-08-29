@@ -16,6 +16,7 @@ Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是�
 > 大神们常说：PC端写css3，优雅降级才是王道。但是鉴于草根前端er们在项目组中的地位，往往无法说服领导。今天，你不用再取舍，使用本项目尽情使用css3吧
 
 使用方式：
+
 ```HTML
 <!--[if lte IE 9]>
 	<script src="selectivizr.js"></script>
@@ -35,6 +36,7 @@ Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是�
 
 ## 注意事项
 
-- 为推进大家写更规范的代码，请将css写入文件中，行内和页面内样式均不支持
-- 出现元素背景及边框消失的情况，请用 `position: relative;` 方式修正
-- 请在http环境下测试，不要本地双击打开文件
+- 不支持style属性中的行内样式。
+- 如果需要本地双击html文件方式使用，请在Selectivizr前加载jQuery。
+- 出现元素背景及边框消失的情况，请用 `position: relative; zoom: 1` 方式修正，加给元素本身或其父元素。
+- IE6-8下，如果中有<style>标签，将会有ajax get请求获取原始的html。

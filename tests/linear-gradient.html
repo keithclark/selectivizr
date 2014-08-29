@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8" />
+<title>linear-gradient()_CSS参考手册_web前端开发参考手册系列</title>
+<meta name="author" content="Joy Du(飘零雾雨), dooyoe@gmail.com, www.doyoe.com" />
+<script src="jquery.min.js"></script>
+<script src="../selectivizr.js"></script>
+<style>
+div{width:200px;height:100px;margin-top:10px;border:1px solid #ddd;}
+.test{background:-moz-linear-gradient(#fff,#333);background:-webkit-gradient(linear,center top,center bottom,from(#fff),to(#333));background:-webkit-linear-gradient(#fff,#333);background:-o-linear-gradient(#fff,#333);background:-ms-linear-gradient(#fff,#333);background:linear-gradient(#fff,#333);}
+.test2{background:-moz-linear-gradient(#000,#f00 50%,#090);background:-webkit-gradient(linear,center top,center bottom,from(#000),color-stop(.5,#f00),to(#090));background:-webkit-linear-gradient(#000,#f00 50%,#090);background:-o-linear-gradient(#000,#f00 50%,#090);background:-ms-linear-gradient(#000,#f00 50%,#090);background:linear-gradient(#000,#f00 50%,#090);}
+.test3{background:-moz-linear-gradient(left center,#000 20%,#f00 50%,#090 80%);background:-webkit-gradient(linear,left center,right center,color-stop(.2,#000),color-stop(.5,#f00),color-stop(.8,#090));background:-webkit-linear-gradient(0deg,#000 20%,#f00 50%,#090 80%);background:-o-linear-gradient(0deg,#000 20%,#f00 50%,#090 80%);background:-ms-linear-gradient(0deg,#000 20%,#f00 50%,#090 80%);background:linear-gradient(0deg,#000 20%,#f00 50%,#090 80%);}
+.test4{background:-moz-linear-gradient(45deg,#000,#f00 50%,#090);background:-webkit-gradient(linear,left bottom,right top,from(#000),color-stop(.5,#f00),to(#090));background:-webkit-linear-gradient(45deg,#000,#f00 50%,#090);background:-o-linear-gradient(45deg,#000,#f00 50%,#090);background:-ms-linear-gradient(45deg,#000,#f00 50%,#090);background:linear-gradient(45deg,#000,#f00 50%,#090);}
+</style>
+</head>
+<body>
+<div class="test"></div>
+<div class="test2"></div>
+<div class="test3"></div>
+<div class="test4"></div>
+</body>
+</html>
