@@ -543,7 +543,7 @@ References:
 			}
 		}
 		if(ieVersion < 9){
-			var stylesheet = document.getElementsByTagName("style");
+			var stylesheet = doc.getElementsByTagName("style");
 			if(stylesheet.length){
 				c = 0;
 				loadStyleSheet(location.href).replace(/<style\b[^>]*>([\s\S]*?)(?=<\/style>)/ig, function(html, css){
