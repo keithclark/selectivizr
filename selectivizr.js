@@ -95,7 +95,9 @@ References:
 	var PLACEHOLDER_STRING					= "$1";
 
 	//PIE
-	var js_path								= doc.scripts[doc.scripts.length - 1].getAttribute("src").replace(/[^\/]+$/, "");
+	var js_path								= doc.scripts[doc.scripts.length - 1];
+	var rawHTML								= unescape(js_path.innerHTML.replace(/(^\s+|\s+$)/g, ""));
+	js_path									= js_path.getAttribute("src").replace(/[^\/]+$/, "");
 	var pie_path							= win.PIE && "behavior" in PIE ? PIE.behavior : js_path.replace(RE_ORIGIN, "") + "PIE.htc";
 
 	function setLengthUnits(){
@@ -135,7 +137,7 @@ References:
 		if(ieVersion < 10){
 			cssText = cssText.replace(/{(([^{}]*)background(-\w+)?\s*:\s*(linear-gradient\s*\([^;]+))/g, function(str, props, propsPre, backSubVal, gradient){
 				return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
-			});
+			}).replace(/{(?=[^{}]*\bborder-image\s*:[^{}]+})/g, "{" + pie_path);
 			if(ieVersion < 9) {
 				cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g, "{" + pie_path);
 				if(ieVersion < 8){
@@ -546,7 +548,7 @@ References:
 			stylesheet = doc.getElementsByTagName("style");
 			if(stylesheet.length){
 				c = 0;
-				loadStyleSheet(location.href).replace(/<style\b[^>]*>([\s\S]*?)(?=<\/style>)/ig, function(html, css){
+				(rawHTML || (rawHTML = loadStyleSheet(location.href))).replace(/<style\b[^>]*>([\s\S]*?)(?=<\/style>)/ig, function(html, css){
 					stylesheet[c].styleSheet["rawCssText"] = patchStyleSheet(css);
 					c++;
 				});
