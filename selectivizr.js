@@ -33,8 +33,16 @@ References:
 	var xhr = "XMLHttpRequest";
 	var ieVersion = doc.querySelector ? doc.documentMode : (doc.compatMode == "CSS1Compat" ? xhr in win ? 7 : 6 : 5);
 
+	// String constants
+	var EMPTY_STRING						= "";
+	var SPACE_STRING						= " ";
+	var PLACEHOLDER_STRING					= "$1";
+
 	// If were not in standards mode, IE is too old / new or we can't create
-	if ( !(ieVersion>5 && ieVersion<10) ) {
+	if (ieVersion) {
+		toggleElementClass(root, "ie" + ieVersion, true);
+	}
+	if (!(ieVersion > 5 && ieVersion < 10)) {
 		return;
 	}
 
@@ -89,11 +97,6 @@ References:
 	var RE_TIDY_CONSECUTIVE_WHITESPACE		= /\s+/g;
 	var RE_TIDY_TRIM_WHITESPACE				= /^\s*((?:[\S\s]*\S)?)\s*$/;
 	
-	// String constants
-	var EMPTY_STRING						= "";
-	var SPACE_STRING						= " ";
-	var PLACEHOLDER_STRING					= "$1";
-
 	//PIE
 	var js_path								= doc.scripts[doc.scripts.length - 1];
 	var rawHTML								= unescape(js_path.innerHTML.replace(/(^\s+|\s+$)/g, ""));
@@ -592,8 +595,6 @@ References:
 			}
 		}
 	};
-
-	toggleElementClass(root, "ie" + ieVersion, true);
 
 	if(ieVersion < 8){
 		pie_path = "behavior: expression(window.PIE&&PIE.attach_ie67&&PIE.attach_ie67(this));";
