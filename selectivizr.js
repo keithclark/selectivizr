@@ -103,8 +103,8 @@ References:
 	js_path									= js_path.getAttribute("src").replace(/[^\/]+$/, "");
 	var pie_path							= win.PIE && "behavior" in PIE ? PIE.behavior : js_path.replace(RE_ORIGIN, "") + "PIE.htc";
 
-	function setLengthUnits(){
-		var	sizeTester = doc.createComment("fontSizeVal"),
+	function setLengthUnits() {
+		var sizeTester = doc.createElement("fontSizeVal"),
 			vh = root.clientHeight / 100,
 			vw = root.clientWidth / 100,
 			viewport = {
@@ -122,10 +122,10 @@ References:
 
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
-			cssText = stylesheet.rawCssText;
+			cssText = stylesheet["rawCssText"];
 			if (cssText) {
-				stylesheet.cssText = cssText.replace(/\b(\d+(\.\d+)?)(vw|vh|vmax|vmin|rem)\b/g, function(s, num, subNum, strUnit){
-					return (parseFloat(num) * viewport[strUnit] ) + "px";
+				stylesheet.cssText = cssText.replace(/\b(\d+(\.\d+)?)(vw|vh|vmax|vmin|rem)\b/g, function(s, num, subNum, strUnit) {
+					return (parseFloat(num) * viewport[strUnit]) + "px";
 				});
 			}
 		}
@@ -138,7 +138,7 @@ References:
 	function patchStyleSheet( cssText ) {
 
 		if(ieVersion < 10){
-			cssText = cssText.replace(/{(([^{}]*)background(-\w+)?\s*:\s*(linear-gradient\s*\([^;]+))/g, function(str, props, propsPre, backSubVal, gradient){
+			cssText = cssText.replace(/{(([^{}]*)background(-\w+)?\s*:\s*(\w+-gradient\s*\([^;]+))/g, function(str, props, propsPre, backSubVal, gradient){
 				return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
 			}).replace(/{(?=[^{}]*\bborder-image\s*:[^{}]+})/g, "{" + pie_path);
 			if(ieVersion < 9) {
@@ -526,38 +526,35 @@ References:
 
 	// --[ getStyleSheets() ]-----------------------------------------------
 	function getStyleSheets() {
-		if(ieVersion < 8 && win.PIE && !PIE.attach_ie67){
-			PIE.attach_ie67 = function(node){
-				(win.jQuery || function(fn){
+		if (ieVersion < 8 && win.PIE && !PIE.attach_ie67) {
+			PIE.attach_ie67 = function(node) {
+				(win.jQuery || function(fn) {
 					fn();
-				})(function(){
+				})(function() {
 					PIE.attach(node);
 					node.runtimeStyle.behavior = "none";
 				});
 			}
 		}
-		var url, stylesheet, cssText, c;
+		var url, stylesheet, c;
 		for (c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
 			url = stylesheet.href;
 			if ((ieVersion > 8 || url) && !("rawCssText" in stylesheet)) {
-				cssText = stylesheet["rawCssText"] = patchStyleSheet(url ? parseStyleSheet(resolveUrl(url) || url) : stylesheet.owningElement.innerHTML);
-				if (cssText && ieVersion > 8) {
-					stylesheet.cssText = cssText;
-				}
+				stylesheet["rawCssText"] = patchStyleSheet(url ? parseStyleSheet(resolveUrl(url) || url) : stylesheet.owningElement.innerHTML);
 			}
 		}
-		if(ieVersion < 9){
+		if (ieVersion < 9) {
 			stylesheet = doc.getElementsByTagName("style");
-			if(stylesheet.length){
+			if (stylesheet.length) {
 				c = 0;
-				(rawHTML || (rawHTML = loadStyleSheet(location.href))).replace(/<style\b[^>]*>([\s\S]*?)(?=<\/style>)/ig, function(html, css){
+				(rawHTML || (rawHTML = loadStyleSheet(location.href))).replace(/<style\b[^>]*>([\s\S]*?)(?=<\/style>)/ig, function(html, css) {
 					stylesheet[c].styleSheet["rawCssText"] = patchStyleSheet(css);
 					c++;
 				});
 			}
-			setLengthUnits();
 		}
+		setLengthUnits();
 	};
 
 	// --[ init() ]---------------------------------------------------------
@@ -615,13 +612,7 @@ References:
 	var baseUrl = (baseTags.length > 0) ? baseTags[0].href : doc.location.href;
 	getStyleSheets();
 
-	if(ieVersion < 9){
-		var timer;
-		win.attachEvent("onresize", function(){
-			clearTimeout(timer);
-			timer = setTimeout(setLengthUnits, 20);
-		});
-	}
+	win.attachEvent("onresize", setLengthUnits);
 
 	// Bind selectivizr to the ContentLoaded event. 
 	ContentLoaded(function() {
