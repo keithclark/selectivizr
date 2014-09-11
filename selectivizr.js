@@ -560,8 +560,10 @@ References:
 	// --[ init() ]---------------------------------------------------------
 	function init() {
 
-		if(pie_path && !win.PIE){
-			eval.call(win, loadStyleSheet(js_path));
+		if (pie_path && !win.PIE) {
+			try {
+				eval.call(win, loadStyleSheet(js_path));
+			} catch (ex) {}
 		}
 
 		getStyleSheets();
