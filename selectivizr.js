@@ -137,22 +137,35 @@ References:
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
 
-		if(ieVersion < 10){
-			cssText = cssText.replace(/{(([^{}]*)background(-\w+)?\s*:\s*(\w+-gradient\s*\([^;]+))/g, function(str, props, propsPre, backSubVal, gradient){
+		if (ieVersion < 10) {
+			cssText = cssText.replace(/{(([^{}]*)\bbackground(-\w+)?\s*:\s*(\w+-gradient\s*\([^;\}]+))/g, function(str, props, propsPre, backSubVal, gradient) {
 				return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
 			}).replace(/{(?=[^{}]*\bborder-image\s*:[^{}]+})/g, "{" + pie_path);
-			if(ieVersion < 9) {
-				cssText = cssText.replace(/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g, "{" + pie_path);
-				if(ieVersion < 8){
-					cssText = cssText.replace(/display\s*:\s*inline-block;/g , function(s, pre, prop){
-						return s + "display: inline; *zoom: 1;";
-					});
-					if(ieVersion < 7){
-						cssText = cssText.replace(/(\w+-)?(position\s*:\s*)fixed/g , function(s, pre, prop){
-							return pre ? s : prop + "absolute";
-						}).replace(/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g, "{" + pie_path);
+			if (ieVersion < 9) {
+				cssText = cssText.replace(
+					/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g,
+					"{" + pie_path
+				);
+				if (ieVersion < 8) {
+					cssText = cssText.replace(
+						/([;\{]\s*display\s*:\s*inline-block)\s*([;\}])/g,
+						"$1;*display:inline;*zoom:1$2"
+					);
+					if (ieVersion < 7) {
+						cssText = cssText.replace(
+							/([;\{]\s*position\s*:\s*fixed)\s*([;\}])/g,
+							"$1;_position:absolute$2"
+						).replace(
+							/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g,
+							"{" + pie_path
+						);
 					}
 				}
+			} else {
+				cssText = cssText.replace(
+					/([;\{])\s*(transform(-\w+)?\s*:[^;\}]+)/g,
+					"$1-ms-$2;$2"
+				);
 			}
 		}
 
