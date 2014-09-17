@@ -1,0 +1,545 @@
+body{
+	background:#fff;
+}
+
+#doraemon{
+	position:relative;
+	margin:50px;
+}
+
+#head_light{
+	width:50px;
+	height:50px;
+	transform: rotate(20deg);
+	box-shadow:80px 20px 55px #fff;
+	border-radius:45px;
+	position:absolute;
+	top:-20px;
+	left:170px;
+	opacity:0.5
+}
+
+#face{
+	position:relative;
+	width:310px;
+	height:300px;
+	border-radius:146px;
+	background:#07beea;
+	background: linear-gradient(225deg, #fff, #07beea 20%, #10a6ce 73%, #000 95%, #000000 155%);
+	border:#333 2px solid;
+	top:-15px;
+	box-shadow:-5px 10px 15px rgba(0,0,0,0.45);
+
+}
+
+#base{
+	position:relative;
+	top:-5px;
+}
+
+#base_white{
+	position:absolute;
+	border:#000 2px solid;
+	width:264px;
+	height:196px;
+	border-radius: 150px 150px;
+	background:#FFF;
+	background: linear-gradient(225deg, #fff, #fff 75%, #eee 83%, #999 90%, #444 95%, #000);
+	z-index:1;
+	top:85px;
+	left:22px;
+}
+
+
+#eyes{
+	position:relative;
+	top:-5px;
+}
+
+div.eye{
+	position:absolute;
+	border-radius: 35px 35px;
+	border:2px solid #000;
+	width:72px;
+	height:83px;
+	z-index:20;
+	background:#fff;
+}
+
+div.black_eye{
+	position:absolute;
+	width:15px;
+	height:15px;
+	border-radius:10px;
+	background:#333;
+	z-index:21;
+	animation-name: cate;
+	animation-duration: 10s;
+	animation-timing-function: linear;
+	animation-iteration-count: 200;
+}
+
+@keyframes cate{
+	0%{
+		margin:0 0 0 0;
+	}
+	80%	{
+		margin:0px 0 0 0;
+	}
+	85%	{
+		margin:-20px 0 0 0;
+	}
+	90%{
+		margin:0 0 0 0;
+	}
+	93%{
+		margin:0 0 0 7px;
+	}
+	96%{
+		margin:0 0 0 0;
+	}
+	100%{
+		margin:0 0 0 0;
+	}
+}
+
+div.black_left{
+	top:100px;
+	left:130px;
+}
+
+div.black_right{
+	top:100px;
+	left:170px;
+}
+
+div.eye_left{
+	top:45px;
+	left:82px;
+}
+
+div.eye_right{
+	top:45px;
+	left:156px;
+}
+
+#nose{
+	width:32px;
+	height:32px;
+	border:2px solid #000;
+	border-radius:50px;
+	background:#c93e00;
+	position:absolute;
+	top:117px;
+	left:139px;
+	z-index:30;
+}
+
+#nose_light{
+	width:10px;
+	height:10px;
+	border-radius:5px;
+	box-shadow:19px 8px 5px #fff;
+	position:relative;
+	top:0px;
+	left:0px;
+}
+
+
+#nose_line{
+	background:#333;
+	width:3px;
+	height:100px;
+	top:140px;
+	left:155px;
+	position:absolute;
+		z-index:20;
+}
+
+
+#mouth{
+	width:240px;
+	height:240px;
+	border-bottom:3px solid #333;
+	border-radius:120px;
+	position:absolute;
+	top:0px;
+	left:35px;
+	z-index:50;
+	clip:rect(205px auto auto auto);
+}
+
+
+.whiskers{
+	background:#333;
+	height:2px;
+	width:60px;
+	position:absolute;
+	overflow:hidden;
+	z-index:20;
+}
+.whi_right{
+	top:165px;
+	left:210px;
+}
+
+.whi_right_top{
+	top:145px;
+	left:210px;
+}
+
+.whi_right_bottom{
+	top:185px;
+	left:210px;
+}
+
+.whi_left{
+	top:165px;
+	left:50px;
+}
+.whi_left_top{
+	top:145px;
+	left:50px;
+}
+
+.whi_left_bottom{
+	top:185px;
+	left:50px;
+}
+
+#arm_left,
+#arm_right,
+.rotate20,
+.rotate160{
+	behavior: url(transform.htc);
+}
+.rotate20{
+	transform: rotate(20deg);
+}
+
+.rotate160{
+	transform: rotate(160deg);
+}
+
+#choker{
+	position:relative;
+	top:-55px;
+	left:35px;
+	z-index:100;
+}
+
+#belt{
+	width:230px;
+	height:20px;
+	border:#000 solid 2px;
+	background:#ca4100;
+	background: linear-gradient(to bottom, #ca4100, #800400);
+	border-radius:10px;
+		position:relative;
+	left:5px;
+}
+
+#bell{
+	width:40px;
+	height:40px;
+	border-radius:50px;
+	border:2px solid #000;
+	background: linear-gradient(to bottom, #f9f12a, #e9e11a 75%, #a9a100);
+	box-shadow:-5px 5px 10px rgba(0,0,0,0.25);
+	position:relative;
+	top:-15px;
+	left:100px;
+}
+
+#bell_line{
+	width:36px;
+	height:2px;
+	background:#f9f12a;
+	border:#333 solid 2px;
+	position:relative;
+	top:10px;
+}
+
+#bell_circle{
+	width:12px;
+	height:10px;
+	border-radius:5px;
+	background:#000;
+	position:relative;
+	top:14px;
+	left:14px;
+}
+
+#bell_under{
+	width:3px;
+	height:15px;
+	background:#000;
+	position:relative;
+	top:10px;
+	left:18px;
+}
+
+#bell_light{
+	width:10px;
+	height:10px;
+	border-radius:10px;
+	box-shadow:19px 8px 5px #fff;
+	position:relative;
+	opacity:0.7;
+	top:-35px;
+	left:5px;
+}
+
+#doutai{
+	position:absolute;
+	width:220px;
+	height:165px;
+	background:#07beea;
+	background: linear-gradient(to left, #07beea, #0073b3 50%, #0096be 75%, #00b0e0, #0096be 100%, #333 114%);
+	border:#333 2px solid;
+	top:262px;
+	left:46px;
+}
+
+div.base_white2{
+	position:absolute;
+	width:170px;
+	height:170px;
+	border-radius:85px;
+	border:2px solid #000;
+	background:#FFF;
+	background: linear-gradient(225deg, #fff, #fff 75%, #eee 83%, #999 90%, #444 95%, #000);
+}
+
+.doutai_center{
+	top:230px;
+	left:72px;
+}
+
+#circle{
+	position:relative;
+	width:130px;
+	height:130px;
+	border-radius:65px;
+	background:#fff;
+	background: linear-gradient(225deg, #fff, #fff 70%, #f8f8f8 75%, #eee 80%, #ddd 88%, #fff);
+	border:2px solid #000;
+	top:-120px;
+	left:92px;
+}
+#circle_rewrite{
+	position:relative;
+	width:134px;
+	height:60px;
+	background:#fff;
+	border-bottom:2px solid #000;
+	top:-250px;
+	left:92px;
+}
+
+#hand_right{
+	position:absolute;
+	top:272px;
+	left:248px;
+	width:100px;
+	height:100px;
+}
+
+#arm_right{
+	position:relative;
+	width:80px;
+	height:50px;
+	background:#07beea;
+	background: linear-gradient(to bottom, #07beea, #07beea 85%, #555);
+	border:solid 1px #000;
+	z-index:-1;
+	top:17px;
+	transform: rotate(35deg);
+	box-shadow:-10px 7px 10px rgba(0,0,0,0.35);
+}
+
+#hand_left{
+	position:absolute;
+	top:272px;
+	left:-46px;
+	width:100px;
+	height:100px;
+}
+
+#arm_left{
+	position:relative;
+	width:80px;
+	height:50px;
+	background:#07beea;
+	background: linear-gradient(135deg, #0096be, #0096be 55%, #07beea);
+	border:solid 1px #000;
+	z-index:-1;
+	top:17px;
+	left:36px;
+	transform: rotate(145deg);
+	box-shadow:5px -7px 10px rgba(0,0,0,0.25);
+}
+
+div.hand_circle{
+	position:absolute;
+	width:60px;
+	height:60px;
+	border-radius:30px;
+	border:2px solid #000;
+	background:#fff;
+	background: linear-gradient(225deg, #fff, #fff 50%, #eee 70%, #ddd 80%, #999);
+}
+
+.hand_right{
+	top:32px;
+	left:40px;
+}
+
+.arm_rewrite_right{
+	position:relative;
+	width:4px;
+	height:45px;
+	background:#07beea;
+	top:-51px;
+	left:18px;
+}
+
+.hand_left{
+	top:34px;
+	left:10px;
+}
+
+.arm_rewrite_left{
+	position:relative;
+	width:4px;
+	height:50px;
+	background:#07beea;
+	background: linear-gradient(135deg, #0096be, #0096be);
+	top:-52px;
+	left:92px;
+}
+
+
+#foot{
+	position:relative;
+	width:280px;
+	height:40px;
+	top:-141px;
+	left:20px;
+}
+
+#foot_left{
+	width:125px;
+	height:30px;
+	background:#fff;
+	border:solid 2px #333;
+	border-radius: 80px 60px 60px 40px;
+	position:relative;
+	left:8px;
+	top:2px;
+	box-shadow:-6px 0px 10px rgba(0,0,0,0.35);
+	z-index:-1;
+}
+
+#foot_right{
+	position:relative;
+	width:125px;
+	height:30px;
+	background:#fff;
+	border:solid 2px #333;
+	border-radius: 60px 80px 40px 60px;
+	top:-32px;
+	left:141px;
+	box-shadow:-6px 0px 10px rgba(0,0,0,0.35);
+	z-index:-1;
+}
+#foot_left,
+#foot_right{
+	background: linear-gradient(256deg, #fff, #fff 75%, #eee 85%, #999);
+}
+#foot_rewrite{
+	position: absolute;
+	width:20px;
+	height:10px;
+	background:#fff;
+	background: linear-gradient(225deg, #666, #fff 83%, #fff);
+	top:-7px;
+	left:127px;
+	border-top:2px solid #000;
+	border-right:2px solid #000;
+	border-left:2px solid #000;
+	border-radius:40px 40px 0 0 ;
+}
+
+#shadow_doutai_left{
+	width:30px;
+	height:200px;
+	box-shadow:-10px 10px 15px rgba(0,0,0,0.45);
+	position:absolute;
+	top:250px;
+	left:46px;
+	z-index:-10;
+}
+
+#shadow_doutai_right{
+	width:30px;
+	height:200px;
+	box-shadow:10px 10px 25px rgba(0,0,0,0.35);
+	position:absolute;
+	top:240px;
+	left:230px;
+	z-index:-10;
+}
+
+#shadow_doutai_arm{
+	width:85px;
+	height:165px;
+	box-shadow:-100px 10px 15px rgba(0,0,0,0.25);
+	position:absolute;
+	top:230px;
+	left:113px;
+	z-index:10;
+	opacity:0.5;
+	transform: rotate(-20deg);
+	border-bottom-left-radius:40px;
+	border-top-left-radius:20px;
+}
+
+#shadow_belt{
+	width:40px;
+	height:30px;
+	box-shadow:-100px 10px 15px rgba(0,0,0,0.25);
+	position:absolute;
+	top:240px;
+	left:130px;
+	z-index:10;
+	border-bottom-left-radius:40px;
+	z-index:300;
+}
+
+#arm_left:not(\*|*), .arm_rewrite_left:not(\*|*){
+	background:#07beea;
+}
+
+#arm_left, .arm_rewrite_left{
+	background:#07beea\9;
+	*background:#07beea;
+	_background:#07beea;
+}
+
+#kiji{
+	position:relative;
+	top:-150px;
+}
+
+#footer{
+	width:97%;
+	padding:0 0 0 30px;
+	border-bottom:#333 1px solid;
+	margin:-150px 0 0;
+}
+
+#footer a,a:link{
+	color:#09C;
+	position:relative;
+}
