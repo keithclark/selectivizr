@@ -426,6 +426,7 @@ div.hand_circle{
 	height:40px;
 	top:-141px;
 	left:20px;
+	z-index: 1;
 }
 
 #foot_left{
