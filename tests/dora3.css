@@ -52,7 +52,7 @@ body{
 
 
 #eyes{
-	position:relative;
+	position: absolute;
 	top:-5px;
 }
 
@@ -293,10 +293,11 @@ div.eye_right{
 #doutai{
 	position:absolute;
 	width:220px;
-	height:165px;
+	height:170px;
 	background:#07beea;
 	background: linear-gradient(to left, #07beea, #0073b3 50%, #0096be 75%, #00b0e0, #0096be 100%, #333 114%);
 	border:#333 2px solid;
+	border-width: 0 2px;
 	top:262px;
 	left:46px;
 }
@@ -336,7 +337,16 @@ div.base_white2{
 	top:-250px;
 	left:92px;
 }
-
+#arm_left div,
+#arm_right div {
+	position: relative;
+	background:#07beea;
+	width:80px;
+	height:50px;
+	width:80px;
+	height:50px;
+	border:solid 1px #000;
+}
 #hand_right{
 	position:absolute;
 	top:272px;
@@ -346,15 +356,14 @@ div.base_white2{
 }
 
 #arm_right{
-	position:relative;
-	width:80px;
-	height:50px;
-	background:#07beea;
-	background: linear-gradient(to bottom, #07beea, #07beea 85%, #555);
-	border:solid 1px #000;
-	z-index:-1;
+	position:absolute;
+	left: 0;
 	top:17px;
 	transform: rotate(35deg);
+	*left: -1px;
+}
+#arm_right div {
+	background: linear-gradient(to bottom, #07beea, #07beea 85%, #555);
 	box-shadow:-10px 7px 10px rgba(0,0,0,0.35);
 }
 
@@ -367,16 +376,13 @@ div.base_white2{
 }
 
 #arm_left{
-	position:relative;
-	width:80px;
-	height:50px;
-	background:#07beea;
-	background: linear-gradient(135deg, #0096be, #0096be 55%, #07beea);
-	border:solid 1px #000;
-	z-index:-1;
+	position:absolute;
 	top:17px;
 	left:36px;
 	transform: rotate(145deg);
+}
+#arm_left div{
+	background: linear-gradient(135deg, #0096be, #0096be 55%, #07beea);
 	box-shadow:5px -7px 10px rgba(0,0,0,0.25);
 }
 
@@ -396,12 +402,13 @@ div.hand_circle{
 }
 
 .arm_rewrite_right{
-	position:relative;
+	position:absolute;
 	width:4px;
 	height:45px;
 	background:#07beea;
-	top:-51px;
+	top:0;
 	left:18px;
+	z-index: 1
 }
 
 .hand_left{
@@ -410,13 +417,14 @@ div.hand_circle{
 }
 
 .arm_rewrite_left{
-	position:relative;
+	position: absolute;
 	width:4px;
 	height:50px;
 	background:#07beea;
 	background: linear-gradient(135deg, #0096be, #0096be);
-	top:-52px;
+	top:0;
 	left:92px;
+	z-index: 1
 }
 
 
@@ -426,7 +434,6 @@ div.hand_circle{
 	height:40px;
 	top:-141px;
 	left:20px;
-	z-index: 1;
 }
 
 #foot_left{
@@ -439,7 +446,6 @@ div.hand_circle{
 	left:8px;
 	top:2px;
 	box-shadow:-6px 0px 10px rgba(0,0,0,0.35);
-	z-index:-1;
 }
 
 #foot_right{
@@ -452,7 +458,6 @@ div.hand_circle{
 	top:-32px;
 	left:141px;
 	box-shadow:-6px 0px 10px rgba(0,0,0,0.35);
-	z-index:-1;
 }
 #foot_left,
 #foot_right{
@@ -516,16 +521,6 @@ div.hand_circle{
 	z-index:10;
 	border-bottom-left-radius:40px;
 	z-index:300;
-}
-
-#arm_left:not(\*|*), .arm_rewrite_left:not(\*|*){
-	background:#07beea;
-}
-
-#arm_left, .arm_rewrite_left{
-	background:#07beea\9;
-	*background:#07beea;
-	_background:#07beea;
 }
 
 #kiji{
