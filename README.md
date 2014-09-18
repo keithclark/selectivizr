@@ -17,9 +17,11 @@ Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是�
 
 ## 使用方式：
 
+`PIE.htc`、`PIE_IE9.js`、`PIE_IE678.js`、`selectivizr.js` 将这4个文件，放在js目录下，然后页面加入：
+
 ```HTML
 <!--[if lte IE 9]>
-	<script src="selectivizr.js"></script>
+	<script src="js/selectivizr.js"></script>
 <![endif]-->
 ```
 
@@ -39,4 +41,6 @@ Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是�
 - 不支持style属性中的行内样式。
 - 如果需要本地双击html文件方式使用，请在Selectivizr前加载jQuery。
 - 出现元素抖动或者背景及边框消失的情况，请用 `position: relative; zoom: 1;` 方式修正，加给元素本身或其父元素。
-- IE6-8下，如果中有`<style>`标签，将会有ajax get请求获取原始的html(也可将html escape编码后放入`<script>`标签中传入)。
+- IE6-8下，如果中有`<style>`标签，将会有ajax get请求获取原始的html(也可将html escape编码后放入`<script>`标签中传入，以避免ajax)。
+- 如果服务器环境的content-type配置不正确，可能造成css3属性不生效。如Apache，可在`.htaccess`文件中添加一行`AddType text/x-component .htc`即可解决此问题。
+
