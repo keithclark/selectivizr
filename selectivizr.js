@@ -103,6 +103,34 @@ References:
 	js_path									= js_path.getAttribute("src").replace(/[^\/]+$/, "");
 	var pie_path							= win.PIE && "behavior" in PIE ? PIE.behavior : js_path.replace(RE_ORIGIN, "") + "PIE.htc";
 
+	function mediaQueries(strRules) {
+		strRules = strRules.replace(/\(\s*(\w+\-)?msie\s*:\s*([\d\.]+)\s*\)/g, function(s, cond, ver) {
+			ver = parseFloat(ver);
+			if (cond) {
+				if (/^max/.test(cond)) {
+					cond = ver - ieVersion;
+				} else if (/^min/.test(cond)) {
+					cond = ieVersion - ver;
+				}
+				cond = cond >= 0;
+			} else {
+				cond = ver === ieVersion;
+			}
+			return cond ? "(min-width:0px)" : s;
+		});
+		if (ieVersion < 9) {
+			try {
+				/* MediaMatch see https://github.com/reubenmoes/media-match */
+				if (matchMedia(strRules).matches) {
+					strRules = " all ";
+				}
+			} catch (ex) {
+				strRules = strRules.replace(/\s+and\s+\(\s*min-width\s*:\s*0px\s*\)/g, SPACE_STRING);
+			}
+		}
+		return strRules;
+	}
+
 	function setLengthUnits() {
 		var sizeTester = doc.createElement("fontSizeVal"),
 			vh = root.clientHeight / 100,
@@ -124,7 +152,9 @@ References:
 			stylesheet = doc.styleSheets[c];
 			cssText = stylesheet["rawCssText"];
 			if (cssText) {
-				stylesheet.cssText = cssText.replace(/\b(\d+(\.\d+)?)(vw|vh|vmax|vmin|rem)\b/g, function(s, num, subNum, strUnit) {
+				stylesheet.cssText = cssText.replace(/((^|\})\s*@media\s+)([^\{]+)/g, function(str, strPre, s, strRules) {
+					return strPre + mediaQueries(strRules);
+				}).replace(/\b(\d+(\.\d+)?)(vw|vh|vmax|vmin|rem)\b/g, function(s, num, subNum, strUnit) {
 					return (parseFloat(num) * viewport[strUnit]) + "px";
 				});
 			}
