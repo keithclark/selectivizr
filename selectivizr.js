@@ -66,17 +66,19 @@ References:
 	};
 
 	var selectorMethod;
-	var enabledWatchers 					= [];     // array of :enabled/:disabled elements to poll
+	var enabledWatchers						= [];     // array of :enabled/:disabled elements to poll
 	var domPatches							= [];
-	var ie6PatchID 							= 0;      // used to solve ie6's multiple class bug
+	var ie6PatchID							= 0;      // used to solve ie6's multiple class bug
 	var patchIE6MultipleClasses				= true;   // if true adds class bloat to ie6
-	var namespace 							= "slvzr";
+	var namespace							= "slvzr";
+	var strRawCssText						= "rawCssText";
 
 	// Stylesheet parsing regexp's
 	var RE_ORIGIN							= /^\w+:\/\/[^\/]+/;
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
-	var RE_ASSET_URL 						= /(\bbehavior\s*?:[^;}\n\r]+)?\burl\(\s*(["']?)(?!\w+:)([^"')]+)\2\s*\)/g;
+	var RE_MEDIA							= /((^|\})\s*@media\s+)([^\{]+)/g
+	var RE_ASSET_URL						= /(\bbehavior\s*?:[^;}\n\r]+)?\burl\(\s*(["']?)(?!\w+:)([^"')]+)\2\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g;
 	var RE_SELECTOR_GROUP					= /((?:^|(?:\s*})+)(?:\s*@media[^{]+{)?)\s*([^\{]*?[\[:][^{]+)/g;
@@ -97,40 +99,11 @@ References:
 	var RE_TIDY_CONSECUTIVE_WHITESPACE		= /\s+/g;
 	var RE_TIDY_TRIM_WHITESPACE				= /^\s*((?:[\S\s]*\S)?)\s*$/;
 	
-	//PIE
-	var js_path								= doc.scripts[doc.scripts.length - 1];
-	var rawHTML								= unescape(js_path.innerHTML.replace(/(^\s+|\s+$)/g, ""));
-	js_path									= js_path.getAttribute("src").replace(/[^\/]+$/, "");
+	// PIE
+	var js_path								= doc.scripts[doc.scripts.length - 1].getAttribute("src").replace(/[^\/]+$/, "");
 	var pie_path							= win.PIE && "behavior" in PIE ? PIE.behavior : js_path.replace(RE_ORIGIN, "") + "PIE.htc";
 
-	function mediaQueries(strRules) {
-		strRules = strRules.replace(/\(\s*(\w+\-)?msie\s*:\s*([\d\.]+)\s*\)/g, function(s, cond, ver) {
-			ver = parseFloat(ver);
-			if (cond) {
-				if (/^max/.test(cond)) {
-					cond = ver - ieVersion;
-				} else if (/^min/.test(cond)) {
-					cond = ieVersion - ver;
-				}
-				cond = cond >= 0;
-			} else {
-				cond = ver === ieVersion;
-			}
-			return cond ? "(min-width:0px)" : s;
-		});
-		if (ieVersion < 9) {
-			try {
-				/* MediaMatch see https://github.com/reubenmoes/media-match */
-				if (matchMedia(strRules).matches) {
-					strRules = " all ";
-				}
-			} catch (ex) {
-				strRules = strRules.replace(/\s+and\s+\(\s*min-width\s*:\s*0px\s*\)/g, SPACE_STRING);
-			}
-		}
-		return strRules;
-	}
-
+	// IE media queries, vm, vw, vh, vmax, vmin, rem 
 	function setLengthUnits() {
 		var sizeTester = doc.createElement("fontSizeVal"),
 			vh = root.clientHeight / 100,
@@ -150,13 +123,23 @@ References:
 
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
-			cssText = stylesheet["rawCssText"];
+			cssText = stylesheet[strRawCssText];
 			if (cssText) {
-				stylesheet.cssText = cssText.replace(/((^|\})\s*@media\s+)([^\{]+)/g, function(str, strPre, s, strRules) {
-					return strPre + mediaQueries(strRules);
-				}).replace(/\b(\d+(\.\d+)?)(vw|vh|vmax|vmin|rem)\b/g, function(s, num, subNum, strUnit) {
+				cssText = cssText.replace(/\b(\d+(\.\d+)?)(vw|vh|vmax|vmin|rem)\b/g, function(s, num, subNum, strUnit) {
 					return (parseFloat(num) * viewport[strUnit]) + "px";
 				});
+				// call media.match.js see https://github.com/reubenmoes/media-match */
+				if (ieVersion < 9 && win.matchMedia) {
+					cssText = cssText.replace(RE_MEDIA, function(str, strPre, s, strRules) {
+						try {
+							if (matchMedia(strRules).matches) {
+								strRules = " all ";
+							}
+						} catch (ex) {}
+						return strPre + strRules;
+					})
+				}
+				stylesheet.cssText = cssText;
 			}
 		}
 	}
@@ -167,10 +150,32 @@ References:
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
 
+		// css IE version query
+		cssText = cssText.replace(RE_MEDIA, function(str, strPre, s, strRules) {
+			return strPre + strRules.replace(/\s+and\s+\(\s*(\w+\-)?msie\s*:\s*([\d\.]+)\s*\)/g, function(s, cond, ver) {
+				ver = parseFloat(ver);
+				if (cond) {
+					if (/^max/.test(cond)) {
+						cond = ver - ieVersion;
+					} else if (/^min/.test(cond)) {
+						cond = ieVersion - ver;
+					}
+					cond = cond >= 0;
+				} else {
+					cond = ver === ieVersion;
+				}
+				return cond ? EMPTY_STRING : s;
+			});
+		});
+
+		// IE CSS3 properties
 		if (ieVersion < 10) {
 			cssText = cssText.replace(/{(([^{}]*)\bbackground(-\w+)?\s*:\s*(\w+-gradient\s*\([^;\}]+))/g, function(str, props, propsPre, backSubVal, gradient) {
 				return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
-			}).replace(/{(?=[^{}]*\bborder-image\s*:[^{}]+})/g, "{" + pie_path);
+			}).replace(
+				/{(?=[^{}]*\bborder-image\s*:[^{}]+})/g,
+				"{" + pie_path
+			);
 			if (ieVersion < 9) {
 				cssText = cssText.replace(
 					/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g,
@@ -199,34 +204,35 @@ References:
 			}
 		}
 
+		// IE CSS3 selector
 		return ieVersion > 8 ? cssText : cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
-    			var selectorGroups = selectorText.split(",");
-    			for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
-    				var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
-    				var patches = [];
-    				selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, 
-    					function(match, combinator, pseudo, attribute, index) {
-    						if (combinator) {
-    							if (patches.length>0) {
-    								domPatches.push( { selector: selector.substring(0, index), patches: patches } )
-    								patches = [];
-    							}
-    							return combinator;
-    						}		
-    						else {
-    							var patch = (pseudo) ? patchPseudoClass( pseudo ) : patchAttribute( attribute );
-    							if (patch) {
-    								patches.push(patch);
-    								return "." + patch.className;
-    							}
-    							return match;
-    						}
-    					}
-    				);
-    			}
-    			return prefix + selectorGroups.join(",");
-    		});
+				var selectorGroups = selectorText.split(",");
+				for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
+					var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
+					var patches = [];
+					selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, 
+						function(match, combinator, pseudo, attribute, index) {
+							if (combinator) {
+								if (patches.length>0) {
+									domPatches.push( { selector: selector.substring(0, index), patches: patches } )
+									patches = [];
+								}
+								return combinator;
+							}		
+							else {
+								var patch = (pseudo) ? patchPseudoClass( pseudo ) : patchAttribute( attribute );
+								if (patch) {
+									patches.push(patch);
+									return "." + patch.className;
+								}
+								return match;
+							}
+						}
+					);
+				}
+				return prefix + selectorGroups.join(",");
+			});
 	};
 
 	// --[ patchAttribute() ]-----------------------------------------------
@@ -579,22 +585,25 @@ References:
 				});
 			}
 		}
-		var url, stylesheet, c;
-		for (c = 0; c < doc.styleSheets.length; c++) {
-			stylesheet = doc.styleSheets[c];
-			url = stylesheet.href;
-			if ((ieVersion > 8 || url) && !("rawCssText" in stylesheet)) {
-				stylesheet["rawCssText"] = patchStyleSheet(url ? parseStyleSheet(resolveUrl(url) || url) : stylesheet.owningElement.innerHTML);
+
+		var styles = doc.getElementsByTagName("style"),
+			styleSheet,
+			rawCssText,
+			url,
+			i;
+		for (i = styles.length - 1; i >= 0; i--) {
+			rawCssText = styles[i].innerHTML;
+			styleSheet = styles[i].styleSheet;
+			if (!(strRawCssText in styleSheet)) {
+				styleSheet[strRawCssText] = patchStyleSheet(rawCssText);
 			}
 		}
-		if (ieVersion < 9) {
-			stylesheet = doc.getElementsByTagName("style");
-			if (stylesheet.length) {
-				c = 0;
-				(rawHTML || (rawHTML = loadStyleSheet(location.href))).replace(/<style\b[^>]*>([\s\S]*?)(?=<\/style>)/ig, function(html, css) {
-					stylesheet[c].styleSheet["rawCssText"] = patchStyleSheet(css);
-					c++;
-				});
+
+		for (i = doc.styleSheets.length - 1; i >= 0; i--) {
+			styleSheet = doc.styleSheets[i]
+			url = styleSheet.href;
+			if (url && !(strRawCssText in styleSheet)) {
+				styleSheet[strRawCssText] = patchStyleSheet(parseStyleSheet(resolveUrl(url) || url));
 			}
 		}
 		setLengthUnits();
@@ -751,6 +760,5 @@ References:
 				})();
 			}
 		}
-
-	};
+	}
 })(this);
