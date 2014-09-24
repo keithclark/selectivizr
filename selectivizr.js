@@ -197,9 +197,19 @@ References:
 					}
 				}
 			} else {
+				// Add prefix for transform
 				cssText = cssText.replace(
 					/([;\{])\s*(transform(-\w+)?\s*:[^;\}]+)/g,
 					"$1-ms-$2;$2"
+				).replace(
+					/\bfilter\s*:\s*([^;\}]+)/g,
+					function(s, vals) {
+						// Disable some filter that conflict with CSS3
+						vals = vals.split(/\s+(?=\w+\s*[\(\:])/).filter(function(filter){
+							return !/^(progid\s*\:\s*DXImageTransform\.Microsoft\.)?(Alpha|Matrix|Gradient|FlipH|FlipV)\s*\(/i.test(filter);
+						}).join(" ").trim();
+						return vals ? "filter: " + vals : "";
+					}
 				);
 			}
 		}
