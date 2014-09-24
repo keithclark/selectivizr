@@ -129,7 +129,7 @@ References:
 					return (parseFloat(num) * viewport[strUnit]) + "px";
 				});
 				// call media.match.js see https://github.com/reubenmoes/media-match */
-				if (ieVersion < 9 && win.matchMedia) {
+				if (ieVersion < 9 && win.styleMedia) {
 					cssText = cssText.replace(RE_MEDIA, function(str, strPre, s, strRules) {
 						try {
 							if (styleMedia.matchMedium(strRules)) {
@@ -137,7 +137,7 @@ References:
 							}
 						} catch (ex) {}
 						return strPre + strRules;
-					})
+					});
 				}
 				stylesheet.cssText = cssText;
 			}
