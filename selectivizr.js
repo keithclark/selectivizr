@@ -132,7 +132,7 @@ References:
 				if (ieVersion < 9 && win.matchMedia) {
 					cssText = cssText.replace(RE_MEDIA, function(str, strPre, s, strRules) {
 						try {
-							if (matchMedia(strRules).matches) {
+							if (styleMedia.matchMedium(strRules)) {
 								strRules = " all ";
 							}
 						} catch (ex) {}
