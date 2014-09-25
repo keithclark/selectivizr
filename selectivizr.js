@@ -81,7 +81,7 @@ References:
 	var RE_ORIGIN							= /^\w+:\/\/[^\/]+/;
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
-	var RE_MEDIA							= /((^|\})\s*@media\s+)([^\{]+)/g
+	var RE_MEDIA							= /@media\s+([^\{]+)/g
 	var RE_ASSET_URL						= /(\bbehavior\s*?:[^;}\n\r]+)?\burl\(\s*(["']?)(?!\w+:)([^"')]+)\2\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g;
@@ -139,13 +139,13 @@ References:
 				});
 				// call media.match.js see https://github.com/reubenmoes/media-match */
 				if (ieVersion < 9 && win.styleMedia) {
-					cssText = cssText.replace(RE_MEDIA, function(str, strPre, s, strRules) {
+					cssText = cssText.replace(RE_MEDIA, function(str, strRules) {
 						try {
 							if (styleMedia.matchMedium(strRules)) {
-								strRules = " all ";
+								str = "@media all ";
 							}
 						} catch (ex) {}
-						return strPre + strRules;
+						return str;
 					});
 				}
 				stylesheet.cssText = cssText;
@@ -160,8 +160,8 @@ References:
 	function patchStyleSheet( cssText ) {
 
 		// css IE version query
-		cssText = cssText.replace(RE_MEDIA, function(str, strPre, s, strRules) {
-			return strPre + strRules.replace(/\s+and\s+\(\s*(\w+\-)?msie\s*:\s*([\d\.]+)\s*\)/g, function(s, cond, ver) {
+		cssText = cssText.replace(RE_MEDIA, function(str, strRules) {
+			return "@media " + strRules.replace(/\s+and\s+\(\s*(\w+\-)?msie\s*:\s*([\d\.]+)\s*\)/g, function(s, cond, ver) {
 				ver = parseFloat(ver);
 				if (cond) {
 					if (/^max/.test(cond)) {
@@ -191,12 +191,12 @@ References:
 			);
 			if (ieVersion < 8) {
 				cssText = cssText.replace(
-					/([;\{]\s*display\s*:\s*inline-block)\s*([;\}])/g,
+					/([;\{\r\n]\s*display\s*:\s*inline-block)\s*([;\}])/g,
 					"$1;*display:inline;*zoom:1$2"
 				);
 				if (ieVersion < 7) {
 					cssText = cssText.replace(
-						/([;\{]\s*position\s*:\s*fixed)\s*([;\}])/g,
+						/([;\{\r\n]\s*position\s*:\s*fixed)\s*([;\}])/g,
 						"$1;_position:absolute$2"
 					).replace(
 						/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g,
@@ -207,7 +207,7 @@ References:
 		} else {
 			// Add prefix for transform
 			cssText = cssText.replace(
-				/([;\{])\s*(transform(-\w+)?\s*:[^;\}]+)/g,
+				/([;\{\r\n])\s*(transform(-\w+)?\s*:[^;\}]+)/g,
 				"$1-ms-$2;$2"
 			).replace(
 				/\bfilter\s*:\s*([^;\}]+)/g,
