@@ -1,10 +1,7 @@
 /* selectivizr test suite common CSS styles
 ------------------------------------------------------------------------------------ */
 form {
-	background: -webkit-linear-gradient(to bottom, #FFFFFF, #999999);
-	-pie-background: linear-gradient(to bottom, #FFFFFF, #999999);
 	background: linear-gradient(to bottom, #FFFFFF, #999999);
-	-webkit-box-shadow: 0 0 4px 0 #000000;
 	box-shadow: 0 0 4px 0 #000000;
 	border-radius: 15px;
 	position: relative;
@@ -12,8 +9,6 @@ form {
 	margin: 20px;
 }
 form:hover {
-	background: -webkit-linear-gradient(to bottom, #999999, #FFFFFF);
-	-pie-background: linear-gradient(to bottom, #999999, #FFFFFF);
 	background: linear-gradient(to bottom, #999999, #FFFFFF);
 }
 body {

@@ -42,7 +42,11 @@ References:
 	if (ieVersion) {
 		toggleElementClass(root, "ie" + ieVersion, true);
 	}
+	var js_path								= (doc.scripts ? doc.scripts[doc.scripts.length - 1] : doc.querySelector("script:last-child")).getAttribute("src").replace(/[^\/]+$/, "");
 	if (!(ieVersion > 5 && ieVersion < 10)) {
+		if(!win.StyleFix) {
+			loadScript(js_path + "prefixfree.min.js");
+		}
 		return;
 	}
 
@@ -100,8 +104,13 @@ References:
 	var RE_TIDY_TRIM_WHITESPACE				= /^\s*((?:[\S\s]*\S)?)\s*$/;
 	
 	// PIE
-	var js_path								= doc.scripts[doc.scripts.length - 1].getAttribute("src").replace(/[^\/]+$/, "");
 	var pie_path							= win.PIE && "behavior" in PIE ? PIE.behavior : js_path.replace(RE_ORIGIN, "") + "PIE.htc";
+
+	function loadScript(src) {
+		var script = doc.createElement("script");
+		script.src = src;
+		root.children[0].appendChild(script);
+	}
 
 	// IE media queries, vm, vw, vh, vmax, vmin, rem 
 	function setLengthUnits() {
@@ -169,49 +178,47 @@ References:
 		});
 
 		// IE CSS3 properties
-		if (ieVersion < 10) {
-			cssText = cssText.replace(/{(([^{}]*)\bbackground(-\w+)?\s*:\s*(\w+-gradient\s*\([^;\}]+))/g, function(str, props, propsPre, backSubVal, gradient) {
-				return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
-			}).replace(
-				/{(?=[^{}]*\bborder-image\s*:[^{}]+})/g,
+		cssText = cssText.replace(/{(([^{}]*)\bbackground(-\w+)?\s*:\s*(\w+-gradient\s*\([^;\}]+))/g, function(str, props, propsPre, backSubVal, gradient) {
+			return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
+		}).replace(
+			/{(?=[^{}]*\bborder-image\s*:[^{}]+})/g,
+			"{" + pie_path
+		);
+		if (ieVersion < 9) {
+			cssText = cssText.replace(
+				/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g,
 				"{" + pie_path
 			);
-			if (ieVersion < 9) {
+			if (ieVersion < 8) {
 				cssText = cssText.replace(
-					/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g,
-					"{" + pie_path
+					/([;\{]\s*display\s*:\s*inline-block)\s*([;\}])/g,
+					"$1;*display:inline;*zoom:1$2"
 				);
-				if (ieVersion < 8) {
+				if (ieVersion < 7) {
 					cssText = cssText.replace(
-						/([;\{]\s*display\s*:\s*inline-block)\s*([;\}])/g,
-						"$1;*display:inline;*zoom:1$2"
+						/([;\{]\s*position\s*:\s*fixed)\s*([;\}])/g,
+						"$1;_position:absolute$2"
+					).replace(
+						/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g,
+						"{" + pie_path
 					);
-					if (ieVersion < 7) {
-						cssText = cssText.replace(
-							/([;\{]\s*position\s*:\s*fixed)\s*([;\}])/g,
-							"$1;_position:absolute$2"
-						).replace(
-							/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g,
-							"{" + pie_path
-						);
-					}
 				}
-			} else {
-				// Add prefix for transform
-				cssText = cssText.replace(
-					/([;\{])\s*(transform(-\w+)?\s*:[^;\}]+)/g,
-					"$1-ms-$2;$2"
-				).replace(
-					/\bfilter\s*:\s*([^;\}]+)/g,
-					function(s, vals) {
-						// Disable some filter that conflict with CSS3
-						vals = vals.split(/\s+(?=\w+\s*[\(\:])/).filter(function(filter){
-							return !/^(progid\s*\:\s*DXImageTransform\.Microsoft\.)?(Alpha|Matrix|Gradient|FlipH|FlipV)\s*\(/i.test(filter);
-						}).join(" ").trim();
-						return vals ? "filter: " + vals : "";
-					}
-				);
 			}
+		} else {
+			// Add prefix for transform
+			cssText = cssText.replace(
+				/([;\{])\s*(transform(-\w+)?\s*:[^;\}]+)/g,
+				"$1-ms-$2;$2"
+			).replace(
+				/\bfilter\s*:\s*([^;\}]+)/g,
+				function(s, vals) {
+					// Disable some filter that conflict with CSS3
+					vals = trim(vals.split(/\s+(?=\w+\s*[\(\:])/).filter(function(filter){
+						return !/^(progid\s*\:\s*DXImageTransform\.Microsoft\.)?(Alpha|Matrix|Gradient|FlipH|FlipV)\s*\(/i.test(filter);
+					}).join(" "));
+					return vals ? "filter: " + vals : "";
+				}
+			);
 		}
 
 		// IE CSS3 selector
@@ -666,9 +673,8 @@ References:
 	}
 
 	if(pie_path && !win.PIE){
-		var script = doc.createElement("script");
-		js_path = script.src = js_path + "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
-		root.children[0].appendChild(script);
+		js_path += "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
+		loadScript(js_path);
 	}
 
 	// Determine the baseUrl and download the stylesheets
