@@ -3,10 +3,6 @@ Selectivizr
 
 **CSS3 for IE 6-9**
 
-## Selectivizr ##
-
-Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是：http://selectivizr.com/
-
 ## Fork ##
 
 这个fork整合了[修改版的PIE](https://github.com/gucong3000/PIE)，从而让IE6-9获得css3的选择器之外，或获得了圆角、阴影、渐变色资源等css3属性的支持
@@ -17,7 +13,7 @@ Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是�
 
 ## 使用方式：
 
-`PIE.htc`、`PIE_IE9.js`、`PIE_IE678.js`、`selectivizr.js` 将这4个文件，放在js目录下，然后页面加入：
+[PIE.htc](PIE.htc)、[PIE_IE9.js](PIE_IE9.js)、[PIE_IE678.js](PIE_IE678.js)、[selectivizr.js](selectivizr.js) 将这4个文件，放在js目录下，然后页面加入：
 
 ```HTML
 <!--[if lte IE 9]>
@@ -30,6 +26,7 @@ Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是�
 - [盒阴影(box-shadow)](http://gucong3000.github.io/css-book/properties/border/box-shadow.htm)
 - [边框图(border-image)](http://gucong3000.github.io/css-book/properties/border/border-image.htm)
 - [线性背景渐变(linear-gradient)](http://gucong3000.github.io/css-book/values/image/linear-gradient%28%29.htm)
+- [媒体查询(mediaqueries)](http://www.w3.org/TR/css3-mediaqueries/) 除了普通的媒体查询，还可以这样使用：`@media all and(msie:8) {}`、`@media all and(min-msie:8) {}`、`@media all and(max-msie:8) {}`
 - display: inline-block; (为IE6-IE7提供支持)
 - position: fixed (IE6， 部分支持，自动以`absolute`替换)
 - IE6下png图片透明(如果未使用其他css3属性，单纯需要修复IE6 png问题，可在css中写入：`-pie-png-fix: true;`)
@@ -41,6 +38,6 @@ Selectivizr是一个为IE6-8提供css3选择器的js库，他的官方网站是�
 - 不支持style属性中的行内样式。
 - 如果需要本地双击html文件方式使用，请在Selectivizr前加载jQuery。
 - 出现元素抖动或者背景及边框消失的情况，请用 `position: relative; zoom: 1;` 方式修正，加给元素本身或其父元素。
-- IE6-8下，如果中有`<style>`标签，将会有ajax get请求获取原始的html(也可将html escape编码后放入`<script>`标签中传入，以避免ajax)。
+- IE6-8下，应该尽量避免使用`<style>`标签。
 - 如果服务器环境的content-type配置不正确，可能造成css3属性不生效。如Apache，可在`.htaccess`文件中添加一行`AddType text/x-component .htc`即可解决此问题。
 
