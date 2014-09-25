@@ -32,12 +32,13 @@ Selectivizr
 - IE6下png图片透明(如果未使用其他css3属性，单纯需要修复IE6 png问题，可在css中写入：`-pie-png-fix: true;`)
 - 相对长度单位: [vw](http://gucong3000.github.io/css-book/values/length/vw.htm), [vh](http://gucong3000.github.io/css-book/values/length/vh.htm), [vmin](http://gucong3000.github.io/css-book/values/length/vmin.htm), [vmax](http://gucong3000.github.io/css-book/values/length/vmax.htm), [rem](http://gucong3000.github.io/css-book/values/length/rem.htm)
 - css选择符(建议与nwmatcher共同使用)。[详见selectivizr官方网站](http://selectivizr.com/#how) 
+- IE9下自动为[transform](http://gucong3000.github.io/css-book/properties/transform/transform.htm)、[transform-origin](http://gucong3000.github.io/css-book/properties/transform/transform-origin.htm)属性添加前缀`-ms-`， 自动关掉与css3属性冲突的几个滤镜(Alpha|Matrix|Gradient|FlipH|FlipV)
 
 ## 注意事项
 
 - 不支持style属性中的行内样式。
+- 应该尽量避免使用`<style>`标签。
 - 如果需要本地双击html文件方式使用，请在Selectivizr前加载jQuery。
 - 出现元素抖动或者背景及边框消失的情况，请用 `position: relative; zoom: 1;` 方式修正，加给元素本身或其父元素。
-- IE6-8下，应该尽量避免使用`<style>`标签。
 - 如果服务器环境的content-type配置不正确，可能造成css3属性不生效。如Apache，可在`.htaccess`文件中添加一行`AddType text/x-component .htc`即可解决此问题。
 
