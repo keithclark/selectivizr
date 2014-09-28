@@ -388,8 +388,8 @@
 	z-index: 20;
 	border-radius: 27px;
 	background: #404972;
-	background: -webkit-gradient(linear, 43% 0%, 39% 100%, from(#181818), to(#455289), color-stop(1.0, #455289));
-	background: -moz-linear-gradient(50% 25% 260deg, #181818, #455289, #455289 100%);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#181818), to(#455289));
+	background: linear-gradient(to bottom, #181818, #455289);
 	animation: pupil 2s linear;
 	animation-iteration-count: infinite;
 }
