@@ -126,7 +126,7 @@
                                 value = Number(length);
                             } else if (_units[unit]) {
                                 // If unit is absolute length units
-                                value = length * _dpi / _units[unit];
+                                value = (length * _dpi / _units[unit]).toFixed(2);
                             } else if (unit === 'em' || unit === 'rem') {
                                 // Convert relative length unit to pixels
                                 // Assumed base font size is 16px
