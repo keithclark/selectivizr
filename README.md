@@ -13,15 +13,14 @@ Selectivizr
 
 ## 使用方式：
 
-[PIE.htc](PIE.htc)、[PIE_IE9.js](PIE_IE9.js)、[PIE_IE678.js](PIE_IE678.js)、[selectivizr.js](selectivizr.js) 将这4个文件，放在js目录下，然后页面加入：
+[PIE.htc](PIE.htc)、[PIE_IE9.js](PIE_IE9.js)、[PIE_IE678.js](PIE_IE678.js)、[selectivizr.js](selectivizr.js)、[prefixfree.min.js](prefixfree.min.js) 将这5个文件，放在js目录下，然后在html中，引入所有css文件之后加入：
 
 ```HTML
-<!--[if lte IE 9]>
-	<script src="js/selectivizr.js"></script>
-<![endif]-->
+<script src="js/selectivizr.js"></script>
 ```
 
 ## 功能列表
+- [css3免前缀](http://leaverou.github.io/prefixfree/)
 - [圆角(border-radius)](http://gucong3000.github.io/css-book/properties/border/border-radius.htm)
 - [盒阴影(box-shadow)](http://gucong3000.github.io/css-book/properties/border/box-shadow.htm)
 - [边框图(border-image)](http://gucong3000.github.io/css-book/properties/border/border-image.htm)
@@ -32,7 +31,7 @@ Selectivizr
 - IE6下png图片透明(如果未使用其他css3属性，单纯需要修复IE6 png问题，可在css中写入：`-pie-png-fix: true;`)
 - 相对长度单位: [vw](http://gucong3000.github.io/css-book/values/length/vw.htm), [vh](http://gucong3000.github.io/css-book/values/length/vh.htm), [vmin](http://gucong3000.github.io/css-book/values/length/vmin.htm), [vmax](http://gucong3000.github.io/css-book/values/length/vmax.htm), [rem](http://gucong3000.github.io/css-book/values/length/rem.htm)
 - css选择符(建议与nwmatcher共同使用)。[详见selectivizr官方网站](http://selectivizr.com/#how) 
-- IE9下自动为[transform](http://gucong3000.github.io/css-book/properties/transform/transform.htm)、[transform-origin](http://gucong3000.github.io/css-book/properties/transform/transform-origin.htm)属性添加前缀`-ms-`， 自动关掉与css3属性冲突的几个滤镜(Alpha|Matrix|Gradient|FlipH|FlipV)
+- IE9下自动关掉与css3属性冲突的几个滤镜(Alpha|Matrix|Gradient|FlipH|FlipV)
 
 ## 注意事项
 

@@ -46,10 +46,12 @@ References:
 	if (!(ieVersion > 5 && ieVersion < 10)) {
 		if(!win.StyleFix) {
 			loadScript(js_path + "prefixfree.min.js").onload = function(){
-				if(win.matchMedia && !matchMedia("(min-width:1vmin)").matches || 1){
+				var addEvent = win.addEventListener,
+					tester = doc.createElement("div"),
+					process = StyleFix.process;
+				tester.style.cssText = "font-size:1vmax";
+				if(!/vmax/.test(tester.style.fontSize)){
 					StyleFix.register(vunits);
-					var addEvent = win.addEventListener,
-						process = StyleFix.process;
 					addEvent("resize", process);
 					addEvent("orientationchange", process);
 					process();
@@ -122,12 +124,15 @@ References:
 		return script;
 	}
 
-	function vunits(css) {
-		var vh = root.clientHeight / 100,
-			vw = root.clientWidth / 100,
+	function vunits(css, raw, ele) {
+		if (ele) {
+			css = ele[strRawCssText] || (ele[strRawCssText] = css);
+		}
+		var vh = (win.innerHeight || root.clientHeight) / 100,
+			vw = (win.innerWidth || root.clientWidth) / 100,
 			viewport = {
-				vmax: Math.max(vh, vh),
-				vmin: Math.min(vh, vh),
+				vmax: Math.max(vh, vw),
+				vmin: Math.min(vh, vw),
 				vh: vh,
 				vw: vw
 			};
@@ -711,7 +716,7 @@ References:
 	var baseUrl = (baseTags.length > 0) ? baseTags[0].href : doc.location.href;
 	getStyleSheets();
 
-	win.attachEvent("onresize", setLengthUnits);
+	addEvent(win, "resize", setLengthUnits);
 
 	// Bind selectivizr to the ContentLoaded event. 
 	ContentLoaded(function() {
