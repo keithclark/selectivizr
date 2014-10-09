@@ -159,7 +159,6 @@ References:
 		} else {
 			rem[1] = parseFloat(rem[1]);
 		}
-		var sizeTester = doc.createElement("fontSizeVal")
 
 		for (var c = 0; c < doc.styleSheets.length; c++) {
 			stylesheet = doc.styleSheets[c];
