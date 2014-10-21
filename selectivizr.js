@@ -627,12 +627,19 @@ References:
 	function getStyleSheets() {
 		if (ieVersion < 8 && win.PIE && !PIE.attach_ie67) {
 			PIE.attach_ie67 = function(node) {
-				(win.jQuery || function(fn) {
-					fn();
-				})(function() {
+				function start() {
+					clearTimeout(timer);
 					PIE.attach(node);
-					node.runtimeStyle.behavior = "none";
-				});
+				}
+				var $ = win.jQuery,
+					timer;
+				if($){
+					timer = setTimeout(start, 800);
+					$(start);
+				}else {
+					start();
+				}
+				node.runtimeStyle.behavior = "none";
 			}
 		}
 
@@ -700,7 +707,7 @@ References:
 	if(ieVersion < 8){
 		pie_path = "behavior: expression(window.PIE&&PIE.attach_ie67&&PIE.attach_ie67(this));";
 	} else if(loadStyleSheet(pie_path)) {
-		pie_path = "behavior: url(" + (pie_path) + ");";
+		pie_path = "behavior: url(" + pie_path + ");";
 	} else {
 		pie_path = EMPTY_STRING;
 	}
