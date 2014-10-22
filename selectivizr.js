@@ -54,8 +54,8 @@ References:
 					StyleFix.register(vunits);
 					addEvent("resize", process);
 					addEvent("orientationchange", process);
-					process();
 				}
+				process();
 			};
 		}
 		return;
