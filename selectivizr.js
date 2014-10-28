@@ -131,15 +131,21 @@ References:
 		var vh = (win.innerHeight || root.clientHeight) / 100,
 			vw = (win.innerWidth || root.clientWidth) / 100,
 			viewport = {
-				vmax: Math.max(vh, vw),
-				vmin: Math.min(vh, vw),
-				vh: vh,
-				vw: vw
+				max: Math.max(vh, vw),
+				min: Math.min(vh, vw),
+				h: vh,
+				w: vw
 			};
 
-		return css.replace(/\b(\d+(\.\d+)?)(vw|vh|vmax|vmin)\b/g, function(s, num, subNum, strUnit) {
-			return (num * viewport[strUnit]).toFixed(2) + "px";
-		});
+		return css.replace(
+				/([-:\s])(\.\d+\w+)/g,
+				"$10$2"
+			).replace(
+				/\b(\d+(\.\d+)?)v(w|h|max|min)\b/g,
+				function(s, num, subNum, strUnit) {
+					return (num * viewport[strUnit]).toFixed(4) + "px";
+				}
+			);
 	}
 
 	// IE media queries, vm, vw, vh, vmax, vmin, rem 
