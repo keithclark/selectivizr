@@ -43,6 +43,7 @@ References:
 		toggleElementClass(root, "ie" + ieVersion, true);
 	}
 	var js_path								= (doc.scripts ? doc.scripts[doc.scripts.length - 1] : doc.querySelector("script:last-child")).getAttribute("src").replace(/[^\/]+$/, "");
+	var ajaxCache							= {};
 	if (!(ieVersion > 5 && ieVersion < 10)) {
 		if(!win.StyleFix) {
 			loadScript(js_path + "prefixfree.min.js").onload = function(){
@@ -63,7 +64,6 @@ References:
 
 	// an XMLHttpRequest object then we should get out now.
 	xhr = ieVersion < 7 ? new ActiveXObject("Microsoft.XMLHTTP") : new win[xhr];
-	var ajaxCache = {};
 	
 	// ========================= Common Objects ============================
 
@@ -126,7 +126,12 @@ References:
 
 	function vunits(css, raw, ele) {
 		if (ele) {
-			css = ele[strRawCssText] || (ele[strRawCssText] = css);
+			var url = ele.getAttribute("href") || ele.getAttribute("data-href");
+			if (url) {
+				css = ajaxCache[url] || (ajaxCache[url] = css);
+			} else {
+				css = ele[strRawCssText] || (ele[strRawCssText] = css);
+			}
 		}
 		var vh = (win.innerHeight || root.clientHeight) / 100,
 			vw = (win.innerWidth || root.clientWidth) / 100,
@@ -138,14 +143,14 @@ References:
 			};
 
 		return css.replace(
-				/([-:\s])(\.\d+\w+)/g,
-				"$10$2"
-			).replace(
-				/\b(\d+(\.\d+)?)v(w|h|max|min)\b/g,
-				function(s, num, subNum, strUnit) {
-					return (num * viewport[strUnit]).toFixed(4) + "px";
-				}
-			);
+			/([-:\s])(\.\d+\w+)/g,
+			"$10$2"
+		).replace(
+			/\b(\d+(\.\d+)?)v(w|h|max|min)\b/g,
+			function(s, num, subNum, strUnit) {
+				return (num * viewport[strUnit]).toFixed(4) + "px";
+			}
+		);
 	}
 
 	// IE media queries, vm, vw, vh, vmax, vmin, rem 
