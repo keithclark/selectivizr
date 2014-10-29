@@ -26,27 +26,43 @@ References:
 
 (function(win) {
 
-	// Determine IE version and stop execution if browser isn't IE. This
-	// handles the script being loaded by non IE browsers because the
-	// developer didn't use conditional comments.
-	var ieUserAgent = navigator.userAgent.match(/MSIE (\d+)/);
-	if (!ieUserAgent) {
-		return false;
-	}
-
 	// =========================== Init Objects ============================
 
 	var doc = document;
 	var root = doc.documentElement;
-	var xhr = getXHRObject();
-	var ieVersion = ieUserAgent[1];
+	var xhr = "XMLHttpRequest";
+	var ieVersion = doc.querySelector ? doc.documentMode : (doc.compatMode == "CSS1Compat" ? xhr in win ? 7 : 6 : 5);
+
+	// String constants
+	var EMPTY_STRING						= "";
+	var SPACE_STRING						= " ";
+	var PLACEHOLDER_STRING					= "$1";
 
 	// If were not in standards mode, IE is too old / new or we can't create
-	// an XMLHttpRequest object then we should get out now.
-	if (doc.compatMode != 'CSS1Compat' || ieVersion<6 || ieVersion>8 || !xhr) {
+	if (ieVersion) {
+		toggleElementClass(root, "ie" + ieVersion, true);
+	}
+	var js_path								= (doc.scripts ? doc.scripts[doc.scripts.length - 1] : doc.querySelector("script:last-child")).getAttribute("src").replace(/[^\/]+$/, "");
+	var ajaxCache							= {};
+	if (!(ieVersion > 5 && ieVersion < 10)) {
+		if(!win.StyleFix) {
+			loadScript(js_path + "prefixfree.min.js").onload = function(){
+				var addEvent = win.addEventListener,
+					tester = doc.createElement("div"),
+					process = StyleFix.process;
+				tester.style.cssText = "font-size:calc(1vmax*100000)";
+				if(!/vmax/.test(tester.style.fontSize)){
+					StyleFix.register(vunits);
+					addEvent("resize", process);
+				}
+				process();
+			};
+		}
 		return;
 	}
-	
+
+	// an XMLHttpRequest object then we should get out now.
+	xhr = ieVersion < 7 ? new ActiveXObject("Microsoft.XMLHTTP") : new win[xhr];
 	
 	// ========================= Common Objects ============================
 
@@ -64,16 +80,19 @@ References:
 	};
 
 	var selectorMethod;
-	var enabledWatchers 					= [];     // array of :enabled/:disabled elements to poll
+	var enabledWatchers						= [];     // array of :enabled/:disabled elements to poll
 	var domPatches							= [];
-	var ie6PatchID 							= 0;      // used to solve ie6's multiple class bug
+	var ie6PatchID							= 0;      // used to solve ie6's multiple class bug
 	var patchIE6MultipleClasses				= true;   // if true adds class bloat to ie6
-	var namespace 							= "slvzr";
+	var namespace							= "slvzr";
+	var strRawCssText						= "rawCssText";
 
 	// Stylesheet parsing regexp's
+	var RE_ORIGIN							= /^\w+:\/\/[^\/]+/;
 	var RE_COMMENT							= /(\/\*[^*]*\*+([^\/][^*]*\*+)*\/)\s*?/g;
 	var RE_IMPORT							= /@import\s*(?:(?:(?:url\(\s*(['"]?)(.*)\1)\s*\))|(?:(['"])(.*)\3))\s*([^;]*);/g;
-	var RE_ASSET_URL 						= /(behavior\s*?:\s*)?\burl\(\s*(["']?)(?!data:)([^"')]+)\2\s*\)/g;
+	var RE_MEDIA							= /@media\s+([^\{]+)/g
+	var RE_ASSET_URL						= /(\bbehavior\s*?:[^;}\n\r]+)?\burl\(\s*(["']?)(?!\w+:)([^"')]+)\2\s*\)/g;
 	var RE_PSEUDO_STRUCTURAL				= /^:(empty|(first|last|only|nth(-last)?)-(child|of-type))$/;
 	var RE_PSEUDO_ELEMENTS					= /:(:first-(?:line|letter))/g;
 	var RE_SELECTOR_GROUP					= /((?:^|(?:\s*})+)(?:\s*@media[^{]+{)?)\s*([^\{]*?[\[:][^{]+)/g;
@@ -94,45 +113,186 @@ References:
 	var RE_TIDY_CONSECUTIVE_WHITESPACE		= /\s+/g;
 	var RE_TIDY_TRIM_WHITESPACE				= /^\s*((?:[\S\s]*\S)?)\s*$/;
 	
-	// String constants
-	var EMPTY_STRING						= "";
-	var SPACE_STRING						= " ";
-	var PLACEHOLDER_STRING					= "$1";
+	// PIE
+	var pie_path							= win.PIE && "behavior" in PIE ? PIE.behavior : js_path.replace(RE_ORIGIN, "") + "PIE.htc";
+
+	function loadScript(src) {
+		var script = doc.createElement("script");
+		script.src = src;
+		root.children[0].appendChild(script);
+		return script;
+	}
+
+	function vunits(css, raw, ele) {
+		if (ele) {
+			var url = ele.getAttribute("href") || ele.getAttribute("data-href");
+			if (url) {
+				css = ajaxCache[url] || (ajaxCache[url] = css);
+			} else {
+				css = ele[strRawCssText] || (ele[strRawCssText] = css);
+			}
+		}
+		var vh = (win.innerHeight || root.clientHeight) / 100,
+			vw = (win.innerWidth || root.clientWidth) / 100,
+			viewport = {
+				max: Math.max(vh, vw),
+				min: Math.min(vh, vw),
+				h: vh,
+				w: vw
+			};
+
+		return css.replace(
+			/([-:\s])(\.\d+\w+)/g,
+			"$10$2"
+		).replace(
+			/\b(\d+(\.\d+)?)v(w|h|max|min)\b/g,
+			function(s, num, subNum, strUnit) {
+				return (num * viewport[strUnit]).toFixed(4) + "px";
+			}
+		);
+	}
+
+	// IE media queries, vm, vw, vh, vmax, vmin, rem 
+	function setLengthUnits() {
+		var rem = root.currentStyle.fontSize.match(/([\d\.]+)([^\d\.]+)/),
+			units = {
+				"%": 0.12,
+				em: 12,
+				ex: 6
+			},
+			stylesheet,
+			cssText;
+
+		if(units[rem[2]]){
+			rem[1] = rem[1] * units[rem[2]];
+			rem[2] = "pt";
+		} else {
+			rem[1] = parseFloat(rem[1]);
+		}
+
+		for (var c = 0; c < doc.styleSheets.length; c++) {
+			stylesheet = doc.styleSheets[c];
+			cssText = stylesheet[strRawCssText];
+			if (cssText) {
+				cssText = vunits(cssText);
+				if (ieVersion < 9) {
+					cssText = cssText.replace(/\b(\d+(\.\d+)?)rem\b/g, function(s, num) {
+						return (num * rem[1]) + rem[2];
+					});
+					// call media.match.js see https://github.com/reubenmoes/media-match */
+					if (win.styleMedia) {
+						cssText = cssText.replace(RE_MEDIA, function(str, strRules) {
+							try {
+								if (styleMedia.matchMedium(strRules)) {
+									str = "@media all ";
+								}
+							} catch (ex) {}
+							return str;
+						});
+					}
+				}
+				stylesheet.cssText = cssText;
+			}
+		}
+	}
 
 	// =========================== Patching ================================
-
 	// --[ patchStyleSheet() ]----------------------------------------------
 	// Scans the passed cssText for selectors that require emulation and
 	// creates one or more patches for each matched selector.
 	function patchStyleSheet( cssText ) {
-		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
+
+		// css IE version query
+		cssText = cssText.replace(RE_MEDIA, function(str, strRules) {
+			return "@media " + strRules.replace(/\s+and\s+\(\s*(\w+\-)?msie\s*:\s*([\d\.]+)\s*\)/g, function(s, cond, ver) {
+				ver = parseFloat(ver);
+				if (cond) {
+					if (/^max/.test(cond)) {
+						cond = ver - ieVersion;
+					} else if (/^min/.test(cond)) {
+						cond = ieVersion - ver;
+					}
+					cond = cond >= 0;
+				} else {
+					cond = ver === ieVersion;
+				}
+				return cond ? EMPTY_STRING : s;
+			});
+		});
+
+		// IE CSS3 properties
+		cssText = cssText.replace(/{(([^{}]*)\bbackground(-\w+)?\s*:\s*(\w+-gradient\s*\([^;\}]+))/g, function(str, props, propsPre, backSubVal, gradient) {
+			return /background(-image)?\s*:[^;]*url\(/g.test(propsPre) ? str : "{" + pie_path + "-pie-background:" + gradient + ";" + props;
+		}).replace(
+			/{(?=[^{}]*\bborder-image\s*:[^{}]+})/g,
+			"{" + pie_path
+		);
+		if (ieVersion < 9) {
+			cssText = cssText.replace(
+				/{(?=[^{}]*\b(border-radius|\w+-shadow|pie-background)\s*:[^{}]+})/g,
+				"{" + pie_path
+			);
+			if (ieVersion < 8) {
+				cssText = cssText.replace(
+					/([;\{\r\n]\s*display\s*:\s*inline-block)\s*([;\}])/g,
+					"$1;*display:inline;*zoom:1$2"
+				);
+				if (ieVersion < 7) {
+					cssText = cssText.replace(
+						/([;\{\r\n]\s*position\s*:\s*fixed)\s*([;\}])/g,
+						"$1;_position:absolute$2"
+					).replace(
+						/{(?=[^{}]*-pie-png-fix\s*:\s*true\b)/g,
+						"{" + pie_path
+					);
+				}
+			}
+		} else {
+			// Add prefix for transform
+			cssText = cssText.replace(
+				/([;\{\r\n])\s*(transform(-\w+)?\s*:[^;\}]+)/g,
+				"$1-ms-$2;$2"
+			).replace(
+				/\bfilter\s*:\s*([^;\}]+)/g,
+				function(s, vals) {
+					// Disable some filter that conflict with CSS3
+					vals = trim(vals.split(/\s+(?=\w+\s*[\(\:])/).filter(function(filter){
+						return !/^(progid\s*\:\s*DXImageTransform\.Microsoft\.)?(Alpha|Matrix|Gradient|FlipH|FlipV)\s*\(/i.test(filter);
+					}).join(" "));
+					return vals ? "filter: " + vals : "";
+				}
+			);
+		}
+
+		// IE CSS3 selector
+		return ieVersion > 8 ? cssText : cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {	
-    			var selectorGroups = selectorText.split(",");
-    			for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
-    				var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
-    				var patches = [];
-    				selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, 
-    					function(match, combinator, pseudo, attribute, index) {
-    						if (combinator) {
-    							if (patches.length>0) {
-    								domPatches.push( { selector: selector.substring(0, index), patches: patches } )
-    								patches = [];
-    							}
-    							return combinator;
-    						}		
-    						else {
-    							var patch = (pseudo) ? patchPseudoClass( pseudo ) : patchAttribute( attribute );
-    							if (patch) {
-    								patches.push(patch);
-    								return "." + patch.className;
-    							}
-    							return match;
-    						}
-    					}
-    				);
-    			}
-    			return prefix + selectorGroups.join(",");
-    		});
+				var selectorGroups = selectorText.split(",");
+				for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
+					var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
+					var patches = [];
+					selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, 
+						function(match, combinator, pseudo, attribute, index) {
+							if (combinator) {
+								if (patches.length>0) {
+									domPatches.push( { selector: selector.substring(0, index), patches: patches } )
+									patches = [];
+								}
+								return combinator;
+							}		
+							else {
+								var patch = (pseudo) ? patchPseudoClass( pseudo ) : patchAttribute( attribute );
+								if (patch) {
+									patches.push(patch);
+									return "." + patch.className;
+								}
+								return match;
+							}
+						}
+					);
+				}
+				return prefix + selectorGroups.join(",");
+			});
 	};
 
 	// --[ patchAttribute() ]-----------------------------------------------
@@ -319,6 +479,12 @@ References:
 			className.replace(RE_PATCH_CLASS_NAME_REPLACE, function(a) { return a.charCodeAt(0) }));
 	};
 
+	// --[ isDocComplete() ]-----------------------------------------------------
+	// checks doc.readyState
+	function isDocComplete() {
+		return doc.readyState === "complete";
+	};
+
 	// --[ log() ]----------------------------------------------------------
 	// #DEBUG_START
 	function log( message ) {
@@ -378,23 +544,33 @@ References:
 		elm.attachEvent("on" + eventName, eventHandler);
 	};
 
-	// --[ getXHRObject() ]-------------------------------------------------
-	function getXHRObject() {
-		if (win.XMLHttpRequest) {
-			return new XMLHttpRequest;
-		}
-		try	{ 
-			return new ActiveXObject('Microsoft.XMLHTTP');
-		} catch(e) { 
-			return null;
-		}
-	};
-
 	// --[ loadStyleSheet() ]-----------------------------------------------
 	function loadStyleSheet( url ) {
-		xhr.open("GET", url, false);
-		xhr.send();
-		return (xhr.status==200) ? xhr.responseText : EMPTY_STRING;	
+		var cssText = ajaxCache[url];
+
+		if (win.jQuery) {
+			cssText = jQuery.ajax(url, {
+				dataType: "text",
+				async: false
+			}).responseText;
+		}
+		if (!cssText) {
+			try {
+				xhr.open("GET", url, false);
+				xhr.send();
+				if (xhr.status === 200) {
+					cssText = xhr.responseText;
+				} else {
+					log(url + "\t Error:" + xhr.status);
+				}
+			} catch (ex) {
+				if(RE_ORIGIN.test(url)){
+					cssText = loadStyleSheet(url.replace(RE_ORIGIN, EMPTY_STRING));
+				}
+			}
+			ajaxCache[url] = cssText;
+		}
+		return cssText || EMPTY_STRING;
 	};
 	
 	// --[ resolveUrl() ]---------------------------------------------------
@@ -420,7 +596,7 @@ References:
 		}
 
 		// absolute path
-		if (/^https?:\/\//i.test(url)) {
+		if (/^\w+:\/\//i.test(url)) {
 			return !ignoreSameOriginPolicy && getProtocolAndHost(contextUrl) != getProtocolAndHost(url) ? null : url ;
 		}
 
@@ -459,50 +635,107 @@ References:
 
 	// --[ getStyleSheets() ]-----------------------------------------------
 	function getStyleSheets() {
-		var url, stylesheet;
-		for (var c = 0; c < doc.styleSheets.length; c++) {
-			stylesheet = doc.styleSheets[c];
-			if (stylesheet.href != EMPTY_STRING) {
-				url = resolveUrl(stylesheet.href);
-				if (url) {
-					stylesheet.cssText = stylesheet["rawCssText"] = patchStyleSheet( parseStyleSheet( url ) );
+		if (ieVersion < 8 && win.PIE && !PIE.attach_ie67) {
+			PIE.attach_ie67 = function(node) {
+				function start() {
+					clearTimeout(timer);
+					PIE.attach(node);
 				}
+				var $ = win.jQuery,
+					timer;
+				if($){
+					timer = setTimeout(start, 800);
+					$(start);
+				}else {
+					start();
+				}
+				node.runtimeStyle.behavior = "none";
 			}
 		}
+
+		var styles = doc.getElementsByTagName("style"),
+			styleSheet,
+			rawCssText,
+			url,
+			i;
+		for (i = styles.length - 1; i >= 0; i--) {
+			rawCssText = styles[i].innerHTML;
+			styleSheet = styles[i].styleSheet;
+			if (!(strRawCssText in styleSheet)) {
+				styleSheet[strRawCssText] = patchStyleSheet(rawCssText);
+			}
+		}
+
+		for (i = doc.styleSheets.length - 1; i >= 0; i--) {
+			styleSheet = doc.styleSheets[i]
+			url = styleSheet.href;
+			if (url && !(strRawCssText in styleSheet)) {
+				styleSheet[strRawCssText] = patchStyleSheet(parseStyleSheet(resolveUrl(url) || url));
+			}
+		}
+		setLengthUnits();
 	};
 
 	// --[ init() ]---------------------------------------------------------
 	function init() {
-		applyPatches();
 
-		// :enabled & :disabled polling script (since we can't hook 
-		// onpropertychange event when an element is disabled) 
-		if (enabledWatchers.length > 0) {
-			setInterval( function() {
-				for (var c = 0, cl = enabledWatchers.length; c < cl; c++) {
-					var e = enabledWatchers[c];
-					if (e.disabled !== e.$disabled) {
-						if (e.disabled) {
-							e.disabled = false;
-							e.$disabled = true;
-							e.disabled = true;
-						}
-						else {
-							e.$disabled = e.disabled;
+		if (pie_path && !win.PIE) {
+			try {
+				eval.call(win, loadStyleSheet(js_path));
+			} catch (ex) {}
+		}
+
+		getStyleSheets();
+
+		// If were not in standards mode, IE is too old / new or we can't create
+		if ( ieVersion < 9 ) {
+
+			applyPatches();
+
+			// :enabled & :disabled polling script (since we can't hook 
+			// onpropertychange event when an element is disabled) 
+			if (enabledWatchers.length > 0) {
+				setInterval( function() {
+					for (var c = 0, cl = enabledWatchers.length; c < cl; c++) {
+						var e = enabledWatchers[c];
+						if (e.disabled !== e.$disabled) {
+							if (e.disabled) {
+								e.disabled = false;
+								e.$disabled = true;
+								e.disabled = true;
+							}
+							else {
+								e.$disabled = e.disabled;
+							}
 						}
 					}
-				}
-			}, 250)
+				}, 250);
+			}
 		}
 	};
+
+	if(ieVersion < 8){
+		pie_path = "behavior: expression(window.PIE&&PIE.attach_ie67&&PIE.attach_ie67(this));";
+	} else if(loadStyleSheet(pie_path)) {
+		pie_path = "behavior: url(" + pie_path + ");";
+	} else {
+		pie_path = EMPTY_STRING;
+	}
+
+	if(pie_path && !win.PIE){
+		js_path += "PIE_IE" + ( ieVersion < 9 ? "678" : "9" ) + ".js";
+		loadScript(js_path);
+	}
 
 	// Determine the baseUrl and download the stylesheets
 	var baseTags = doc.getElementsByTagName("BASE");
 	var baseUrl = (baseTags.length > 0) ? baseTags[0].href : doc.location.href;
 	getStyleSheets();
 
+	addEvent(win, "resize", setLengthUnits);
+
 	// Bind selectivizr to the ContentLoaded event. 
-	ContentLoaded(win, function() {
+	ContentLoaded(function() {
 		// Determine the "best fit" selector engine
 		for (var engine in selectorEngines) {
 			var members, member, context = win;
@@ -516,9 +749,9 @@ References:
 				}
 			}
 		}
+		init();
 	});
 	
-
 	
 	/*!
 	 * ContentLoaded.js by Diego Perini, modified for IE<9 only (to save space)
@@ -537,27 +770,61 @@ References:
 
 	// @w window reference
 	// @f function reference
-	function ContentLoaded(win, fn) {
-
-		var done = false, top = true,
-		init = function(e) {
-			if (e.type == "readystatechange" && doc.readyState != "complete") return;
-			(e.type == "load" ? win : doc).detachEvent("on" + e.type, init, false);
-			if (!done && (done = true)) fn.call(win, e.type || e);
-		},
-		poll = function() {
-			try { root.doScroll("left"); } catch(e) { setTimeout(poll, 50); return; }
-			init('poll');
-		};
-
-		if (doc.readyState == "complete") fn.call(win, EMPTY_STRING);
-		else {
-			if (doc.createEventObject && root.doScroll) {
-				try { top = !win.frameElement; } catch(e) { }
-				if (top) poll();
-			}
-			addEvent(doc,"readystatechange", init);
-			addEvent(win,"load", init);
+	function ContentLoaded(fn) {
+		if(win.jQuery){
+			return jQuery(fn);
 		}
-	};
+		var isReady = false;
+		function completed() {
+			// readyState === "complete" is good enough for us to call the dom ready in oldIE
+			if ( !isReady ) {
+				isReady = true;
+				fn();
+			}
+		}
+		if ( isDocComplete() ) {
+			// Handle it asynchronously to allow scripts the opportunity to delay ready
+			setTimeout(completed);
+
+		// Standards-based browsers support DOMContentLoaded
+		} else if ( doc.addEventListener ) {
+			// Use the handy event callback
+			doc.addEventListener( "DOMContentLoaded", completed, false );
+
+		// If IE event model is used
+		} else {
+			// Ensure firing before onload, maybe late but safe also for iframes
+			doc.attachEvent( "onreadystatechange", function(){
+				if( isDocComplete() ){
+					completed();
+				}
+			} );
+
+			// If IE and not a frame
+			// continually check to see if the document is ready
+			var top = false;
+
+			try {
+				top = win.frameElement == null && root;
+			} catch(e) {}
+
+			if ( top && top.doScroll ) {
+				(function doScrollCheck() {
+					if ( !isReady ) {
+
+						try {
+							// Use the trick by Diego Perini
+							// http://javascript.nwbox.com/IEContentLoaded/
+							top.doScroll("left");
+						} catch(e) {
+							return setTimeout( doScrollCheck, 50 );
+						}
+
+						// and execute any waiting functions
+						completed();
+					}
+				})();
+			}
+		}
+	}
 })(this);

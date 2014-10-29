@@ -4,7 +4,12 @@ selectivizr - change log
 Current Build
 -------------
 
+ * NEW - Selectivizr and PIE now have merged, after loading selectivizr, PIE will automatically use the has CSS3 attribute Element
+ * NEW - When the CSS cross domain, try to read CSS from the local, but not from the local read background picture
+ * NEW - update the ContentLoaded method
+ * BUG - Don't use useragent judge IE version, Users may modify useragent string.
  * NEW - Removed condiditional comments so 3rd party tools can correctly compress / compile the source. (GMFlash)
+ * BUG - Fixed load multiple HTC files, only to ignore the first
  * BUG - behaviors (.htc files) are now ignored when processing urls. Fixes "CSS3PIE" issue
  * BUG - resolveUrl() fails to resolve protocol relative urls. Fixes "AddThis" issue
  * NEW - expose selectiviz'd cssText through styleSheet object via 'rawCssText' expando property
