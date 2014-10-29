@@ -50,11 +50,10 @@ References:
 				var addEvent = win.addEventListener,
 					tester = doc.createElement("div"),
 					process = StyleFix.process;
-				tester.style.cssText = "font-size:1vmax";
-				if(!/vmax/.test(tester.style.fontSize)){
+				tester.style.cssText = "font-size:calc(1vmax*100000)";
+				if(!(parseInt(getComputedStyle(tester).fontSize) > 1000)){
 					StyleFix.register(vunits);
 					addEvent("resize", process);
-					addEvent("orientationchange", process);
 				}
 				process();
 			};
