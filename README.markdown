@@ -1,6 +1,9 @@
 Selectivizr
 -----------
 
+This fork is using XDomainRequest() instead of ActiveXObject('Microsoft.XMLHTTP').
+That allows to read CSS from other domain using CORS.
+
 **CSS3 selectors for IE 6-8**
 
 

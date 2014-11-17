@@ -1,4 +1,7 @@
 /*
+
+selectivizr v1.0.4 - forked by Damian Dziaduch, IE8 XHR CORS friendly.
+
 selectivizr v1.0.3b - (c) Keith Clark, freely distributable under the terms 
 of the MIT license.
 
@@ -381,10 +384,10 @@ References:
 	// --[ getXHRObject() ]-------------------------------------------------
 	function getXHRObject() {
 		if (win.XMLHttpRequest) {
-			return new XMLHttpRequest;
+			return new XMLHttpRequest();
 		}
 		try	{ 
-			return new ActiveXObject('Microsoft.XMLHTTP');
+			return new XDomainRequest();
 		} catch(e) { 
 			return null;
 		}
