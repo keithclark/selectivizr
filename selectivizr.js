@@ -382,22 +382,33 @@ References:
 	};
 
 	// --[ getXHRObject() ]-------------------------------------------------
-	function getXHRObject() {
-		if (win.XMLHttpRequest) {
-			return new XMLHttpRequest();
-		}
-		try	{ 
-			return new XDomainRequest();
-		} catch(e) { 
+	function getXHRObject(url) {
+		var xhr;
+		try {
+			if (-1 === url.indexOf(win.location.host) && win.XDomainRequest) {
+				xhr = new win.XDomainRequest();
+			} else if (win.XMLHttpRequest) { {
+				xhr = new win.XMLHttpRequest();
+			} else {
+				xhr = new win.ActiveXObject('Microsoft.XMLHTTP');
+			}
+			xhr.open('GET', url, false);
+			return xhr;
+		} catch (e) {
 			return null;
 		}
 	};
 
 	// --[ loadStyleSheet() ]-----------------------------------------------
-	function loadStyleSheet( url ) {
-		xhr.open("GET", url, false);
-		xhr.send();
-		return (xhr.status==200) ? xhr.responseText : EMPTY_STRING;	
+	function loadStyleSheet(url) {
+		var xhr;
+		try {
+			xhr = getXHRObject(url);
+			xhr.send();
+			return 0 < xhr.responseText.length ? xhr.responseText : EMPTY_STRING;
+		} catch (e) {
+			return EMPTY_STRING;
+		}
 	};
 	
 	// --[ resolveUrl() ]---------------------------------------------------
