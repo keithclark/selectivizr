@@ -41,12 +41,10 @@ References:
 
 	var doc = document;
 	var root = doc.documentElement;
-	var xhr = getXHRObject();
 	var ieVersion = ieUserAgent[1];
 
-	// If were not in standards mode, IE is too old / new or we can't create
-	// an XMLHttpRequest object then we should get out now.
-	if (doc.compatMode != 'CSS1Compat' || ieVersion<6 || ieVersion>8 || !xhr) {
+	// If were not in standards mode, IE is too old / new then we should get out now.
+	if (doc.compatMode != 'CSS1Compat' || ieVersion<6 || ieVersion>8) {
 		return;
 	}
 	
@@ -387,7 +385,7 @@ References:
 		try {
 			if (-1 === url.indexOf(win.location.host) && win.XDomainRequest) {
 				xhr = new win.XDomainRequest();
-			} else if (win.XMLHttpRequest) { {
+			} else if (win.XMLHttpRequest) {
 				xhr = new win.XMLHttpRequest();
 			} else {
 				xhr = new win.ActiveXObject('Microsoft.XMLHTTP');
