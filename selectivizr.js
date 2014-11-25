@@ -38,12 +38,10 @@ References:
 
 	var doc = document;
 	var root = doc.documentElement;
-	var xhr = getXHRObject();
 	var ieVersion = ieUserAgent[1];
 
-	// If were not in standards mode, IE is too old / new or we can't create
-	// an XMLHttpRequest object then we should get out now.
-	if (doc.compatMode != 'CSS1Compat' || ieVersion<6 || ieVersion>8 || !xhr) {
+	// If were not in standards mode, IE is too old / new then we should get out now.
+	if (doc.compatMode != 'CSS1Compat' || ieVersion<6 || ieVersion>8) {
 		return;
 	}
 	
@@ -379,28 +377,41 @@ References:
 	};
 
 	// --[ getXHRObject() ]-------------------------------------------------
-	function getXHRObject() {
-		if (win.XMLHttpRequest) {
-			return new XMLHttpRequest;
-		}
-		try	{ 
-			return new ActiveXObject('Microsoft.XMLHTTP');
-		} catch(e) { 
+	function getXHRObject(url) {
+		var xhr;
+		try {
+			if (-1 === url.indexOf(win.location.host) && win.XDomainRequest) {
+				xhr = new win.XDomainRequest();
+			} else if (win.XMLHttpRequest) {
+				xhr = new win.XMLHttpRequest();
+			} else {
+				xhr = new win.ActiveXObject('Microsoft.XMLHTTP');
+			}
+			xhr.open('GET', url, false);
+			return xhr;
+		} catch (e) {
 			return null;
 		}
 	};
 
 	// --[ loadStyleSheet() ]-----------------------------------------------
-	function loadStyleSheet( url ) {
-		xhr.open("GET", url, false);
-		xhr.send();
-		return (xhr.status==200) ? xhr.responseText : EMPTY_STRING;	
+	function loadStyleSheet(url) {
+		var xhr;
+		try {
+			xhr = getXHRObject(url);
+			xhr.send();
+			return 0 < xhr.responseText.length ? xhr.responseText : EMPTY_STRING;
+		} catch (e) {
+			return EMPTY_STRING;
+		}
 	};
 	
 	// --[ resolveUrl() ]---------------------------------------------------
 	// Converts a URL fragment to a fully qualified URL using the specified
 	// context URL. Returns null if same-origin policy is broken
 	function resolveUrl( url, contextUrl, ignoreSameOriginPolicy ) {
+		var contextUrl = contextUrl || null,
+			ignoreSameOriginPolicy = ignoreSameOriginPolicy || true;
 
 		function getProtocol( url ) {
 			return url.substring(0, url.indexOf("//"));
@@ -409,10 +420,6 @@ References:
 		function getProtocolAndHost( url ) {
 			return url.substring(0, url.indexOf("/", 8));
 		};
-
-		if (!contextUrl) {
-			contextUrl = baseUrl;
-		}
 
 		// protocol-relative path
 		if (url.substring(0,2)=="//") {
