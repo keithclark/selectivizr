@@ -410,6 +410,8 @@ References:
 	// Converts a URL fragment to a fully qualified URL using the specified
 	// context URL. Returns null if same-origin policy is broken
 	function resolveUrl( url, contextUrl, ignoreSameOriginPolicy ) {
+		var contextUrl = contextUrl || null,
+			ignoreSameOriginPolicy = ignoreSameOriginPolicy || true;
 
 		function getProtocol( url ) {
 			return url.substring(0, url.indexOf("//"));
@@ -418,10 +420,6 @@ References:
 		function getProtocolAndHost( url ) {
 			return url.substring(0, url.indexOf("/", 8));
 		};
-
-		if (!contextUrl) {
-			contextUrl = baseUrl;
-		}
 
 		// protocol-relative path
 		if (url.substring(0,2)=="//") {
