@@ -1,0 +1,22 @@
+{
+  "name": "selectivizr-latest",
+  "main": "selectivizr.js",
+  "homepage": "https://github.com/corysimmons/selectivizr",
+  "authors": [
+    "Cory Simmons <cory@launchboxhq.com>"
+  ],
+  "description": "The latest version of selectivizr available to Bower.",
+  "keywords": [
+    "selectivizr",
+    "ie8",
+    "selectors"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
