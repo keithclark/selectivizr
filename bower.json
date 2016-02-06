@@ -1,11 +1,12 @@
 {
-  "name": "selectivizr-latest",
+  "name": "selectivizr2",
   "main": "selectivizr.js",
   "homepage": "https://github.com/corysimmons/selectivizr",
   "authors": [
-    "Cory Simmons <cory@launchboxhq.com>"
+    "Keith Clark",
+    "Cory Simmons"
   ],
-  "description": "The latest version of selectivizr available to Bower.",
+  "description": "A maintained version of Selectivizr.",
   "keywords": [
     "selectivizr",
     "ie8",
