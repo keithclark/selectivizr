@@ -1,5 +1,7 @@
 # 1.0.4
-- NEW - Maintainer
+- Lint code
+- Fix Bower
+- Rebrand as Selectivizr 2
 
 # 1.0.3b
 - NEW - Removed condiditional comments so 3rd party tools can correctly compress / compile the source. (GMFlash)

@@ -34,7 +34,7 @@ Then add the following conditional comment **after** your stylesheets:
 
 ```html
 <!--[if lt IE 9]>
-  <script src="selectivizr.js"></script>
+  <script src="selectivizr2.js"></script>
 <![endif]-->
 ```
 
