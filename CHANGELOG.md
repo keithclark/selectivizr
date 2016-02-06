@@ -1,3 +1,8 @@
+# 1.0.5
+- Fix code
+- Maybe try not releasing new versions until you've tested it genius
+- Remove copyright notice. I'm not sure how something can be copyrighted by a person and be MIT license...
+
 # 1.0.4
 - Lint code
 - Fix Bower

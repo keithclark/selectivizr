@@ -1,7 +1,5 @@
 /*
-	selectivizr2 - 1.0.4
-	(c) Keith Clark, freely distributable under the terms of the MIT license.
-
+	selectivizr2 - 1.0.5
 	selectivizr.com
 
 	Notes about this source
@@ -101,7 +99,7 @@
 		return cssText.replace(RE_PSEUDO_ELEMENTS, PLACEHOLDER_STRING).
 			replace(RE_SELECTOR_GROUP, function(m, prefix, selectorText) {
     			var selectorGroups = selectorText.split(",");
-					function foo(match, combinator, pseudo, attribute, index) {
+					function comboBreaker (match, combinator, pseudo, attribute, index) {
 						if (combinator) {
 							if (patches.length>0) {
 								domPatches.push( { selector: selector.substring(0, index), patches: patches } );
@@ -121,7 +119,7 @@
     			for (var c = 0, cs = selectorGroups.length; c < cs; c++) {
     				var selector = normalizeSelectorWhitespace(selectorGroups[c]) + SPACE_STRING;
     				var patches = [];
-    				selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, foo());
+    				selectorGroups[c] = selector.replace(RE_SELECTOR_PARSE, comboBreaker);
     			}
     			return prefix + selectorGroups.join(",");
     		});
