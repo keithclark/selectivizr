@@ -1,5 +1,5 @@
 /*
-	selectivizr2 - 1.0.5
+	selectivizr2 - 1.0.6
 	selectivizr.com
 
 	Notes about this source

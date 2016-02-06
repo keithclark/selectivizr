@@ -1,3 +1,6 @@
+# 1.0.6
+- Bump ver for npm
+
 # 1.0.5
 - Fix code
 - Maybe try not releasing new versions until you've tested it genius
