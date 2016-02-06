@@ -1,5 +1,5 @@
 /*
-	selectivizr 1.0.3
+	selectivizr2 - 1.0.4
 	(c) Keith Clark, freely distributable under the terms of the MIT license.
 
 	selectivizr.com

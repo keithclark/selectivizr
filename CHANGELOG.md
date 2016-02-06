@@ -1,3 +1,6 @@
+# 1.0.4
+- NEW - Maintainer
+
 # 1.0.3b
 - NEW - Removed condiditional comments so 3rd party tools can correctly compress / compile the source. (GMFlash)
 - BUG - behaviors (.htc files) are now ignored when processing urls. Fixes "CSS3PIE" issue
