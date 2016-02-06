@@ -13,7 +13,6 @@ Notes about this source
    that will be removed prior to building a final release version (using a
    pre-compression script)
 
-
 References:
 -----------
 
@@ -21,7 +20,6 @@ References:
  * Selectors           : http://www.w3.org/TR/css3-selectors/#selectors
  * IE Compatability    : http://msdn.microsoft.com/en-us/library/cc351024(VS.85).aspx
  * W3C Selector Tests  : http://www.w3.org/Style/CSS/Test/CSS3/Selectors/current/html/tests/
-
 */
 
 (function(win) {
@@ -46,7 +44,6 @@ References:
 	if (doc.compatMode != 'CSS1Compat' || ieVersion<6 || ieVersion>8 || !xhr) {
 		return;
 	}
-
 
 	// ========================= Common Objects ============================
 
@@ -285,7 +282,6 @@ References:
 				// #DEBUG_END
 			}
 
-
 			if (elms) {
 				for (var d = 0, dl = elms.length; d < dl; d++) {
 					var elm = elms[d];
@@ -309,7 +305,6 @@ References:
 	function hasPatch( elm, patch ) {
 		return new RegExp("(^|\\s)" + patch.className + "(\\s|$)").test(elm.className);
 	}
-
 
 	// =========================== Utility =================================
 
@@ -518,8 +513,6 @@ References:
 			}
 		}
 	});
-
-
 
 	/*!
 	 * ContentLoaded.js by Diego Perini, modified for IE<9 only (to save space)
