@@ -1,7 +1,7 @@
 {
   "name": "selectivizr2",
   "description": "Selectivizr maintained.",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "selectivizr2.js",
   "repository": {
     "type": "git",

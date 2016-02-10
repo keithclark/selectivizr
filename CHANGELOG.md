@@ -1,3 +1,6 @@
+# 1.0.7
+- IE font fix stolen from https://github.com/JohnCashmore/selectivizr/commit/e2aa3bebe9b10eaf2d4062c4e757dddb6b159ebf
+
 # 1.0.6
 - Bump ver for npm
 
