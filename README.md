@@ -77,5 +77,5 @@ The only people downloading this file will be people below IE9. This means we're
 - https://github.com/shinnn/lt-ie-9 is unmaintained and does more than just Selectivizr anyway.
 - `bower install selectivizr-latest` was what this project was until I decided to actually maintain it.
 
-### Contribute!
+### Caveats
 TBH, I'm not an amazing JS developer yet, so I really have no idea wtf is going on. I'm happy to merge stuff as long as it seems legit but I'm probably not going to spend a ton of time working on this codebase.
