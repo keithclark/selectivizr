@@ -43,7 +43,7 @@ Then add the following conditional comment **after** your stylesheets and jQuery
 
     <div>Hello World</div>
 
-    <script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
     <!--[if lt IE 9]>
       <script src="selectivizr2.js"></script>
     <![endif]-->
