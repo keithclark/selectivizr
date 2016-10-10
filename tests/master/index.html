@@ -111,6 +111,54 @@
 			</tr>
 		</table>
 
+		<h3>Minified @import syntax tests</h3>
+		<table border="1" width="100%">
+			<tr id="min-import-url-quoted-double">
+				<td>@import url("...")</td>
+				<td>Testing @import rule with url wrapped in double quotes and prefixed with the url() qualifier
+			</tr>
+			<tr id="min-import-url-quoted-single">
+				<td>@import url('...')</td>
+				<td>Testing @import rule with url wrapped in single quotes and prefixed with the url() qualifier
+			</tr>
+			<tr id="min-import-url-unquoted">
+				<td>@import url(...)</td>
+				<td>Testing @import rule with url without quotes and prefixed with the url() qualifier
+			</tr>
+			<tr id="min-import-quoted-double">
+				<td>@import "..."</td>
+				<td>Testing @import rule with url wrapped in double quotes without the url() qualifier
+			</tr>
+			<tr id="min-import-quoted-single">
+				<td>@import '...'</td>
+				<td>Testing @import rule with url wrapped in single quotes without the url() qualifier
+			</tr>
+			<tr id="min-import-url-relative">
+				<td>@import url("../file.css")</td>
+				<td>Testing @import rule with a relative path
+			</tr>
+			<tr id="min-import-url-root-relative">
+				<td>@import url("/path/file.css")</td>
+				<td>Testing @import rule with a root-relative path (see note in 'master.css')
+			</tr>
+			<tr id="min-import-url-fully-qualfied">
+				<td>@import url("http://domain/path/file.css")</td>
+				<td>Testing @import rule with a fully qualified path (see note in 'master.css')
+			</tr>
+			<tr id="min-import-url-protocol-relative">
+				<td>@import url("//domain/path/file.css")</td>
+				<td>Testing @import rule with a protocol relative path
+			</tr>
+			<tr id="min-import-print">
+				<td>@import url("...") print</td>
+				<td>Testing @import rule with a print media type
+			</tr>
+			<tr id="min-import-screen">
+				<td>@import url("...") screen</td>
+				<td>Testing @import rule with a screen media type
+			</tr>
+		</table>
+
 		<h3>url syntax tests</h3>
 		<table border="1" width="100%">
 			<tr id="url-quoted-double">
