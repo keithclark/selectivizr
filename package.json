@@ -1,0 +1,22 @@
+{
+  "name": "selectivizr2",
+  "description": "Selectivizr maintained.",
+  "version": "1.0.9",
+  "main": "selectivizr2.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/corysimmons/selectivizr2.git"
+  },
+  "keywords": [
+    "selectivizr",
+    "css3",
+    "selectors",
+    "ie8"
+  ],
+  "author": "Cory Simmons",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/corysimmons/selectivizr2/issues"
+  },
+  "homepage": "http://selectivizr.com"
+}

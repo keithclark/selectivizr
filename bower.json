@@ -1,0 +1,23 @@
+{
+  "name": "selectivizr2",
+  "main": "selectivizr2.js",
+  "homepage": "https://github.com/corysimmons/selectivizr2",
+  "authors": [
+    "Keith Clark",
+    "Cory Simmons"
+  ],
+  "description": "A maintained version of Selectivizr.",
+  "keywords": [
+    "selectivizr",
+    "ie8",
+    "selectors"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
